@@ -16,8 +16,8 @@ export default function DashboardPage() {
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Welcome back, {currentUser.name}</h1>
-          <p className="text-muted-foreground mt-1">Here&apos;s your prediction performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">خوش اومدی، {currentUser.name}</h1>
+          <p className="text-muted-foreground mt-1">اینجا می‌تونی فعالیت‌هاتو ببینی</p>
         </div>
         <Link href="/matches">
           <Button className="gap-2">
