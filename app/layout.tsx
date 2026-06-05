@@ -10,8 +10,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'World Cup Predictor',
-  description: 'Predict World Cup matches and compete with your friends on the leaderboard',
+  title: 'پیش‌بینی جام جهانی',
+  description: 'پیش‌بینی مسابقات جام جهانی و رقابت با دوستان خود در جدول رده‌بندی',
 }
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
+    <html lang="fa" dir='rtl' className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
       <body className="font-sans antialiased min-h-screen">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
