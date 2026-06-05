@@ -22,42 +22,38 @@ export default function LandingPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <Trophy className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold tracking-tight">World Cup Predictor</span>
+            <span className="text-xl font-bold tracking-tight">پیش‌بینی بازی های فوتبال</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/leaderboard">
-              <Button variant="ghost" className="hidden sm:flex">Leaderboard</Button>
+              <Button variant="ghost" className="hidden sm:flex">رده‌بندی</Button>
             </Link>
             <Link href="/dashboard">
-              <Button>Start Predicting</Button>
+              <Button>پیش‌بینی کن</Button>
             </Link>
           </div>
         </nav>
 
         {/* Hero Content */}
         <div className="relative container mx-auto px-4 py-16 sm:py-24 lg:py-32 text-center">
-          <Badge className="mb-6 px-4 py-1.5 text-sm font-medium bg-primary/10 text-primary border-primary/20 hover:bg-primary/15">
-            World Cup 2026
-          </Badge>
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-balance max-w-4xl mx-auto leading-tight">
-            Predict Every Match.{' '}
-            <span className="text-primary">Beat Your Friends.</span>
+            بازی ها رو پیش‌بینی کن.{' '}
+            <span className="text-primary">دوستاتو شکست بده.</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
-            Make predictions for every World Cup game and climb the leaderboard. 
-            Compete with friends and prove you know football best.
+            نشون بده کی بیشتر از همه فوتبالو میشناسه.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/dashboard">
               <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                Start Predicting
+                پیش‌بینی کن
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/leaderboard">
               <Button size="lg" variant="outline" className="gap-2 h-12 px-8 text-base">
                 <Trophy className="h-4 w-4" />
-                View Leaderboard
+                رده‌بندی
               </Button>
             </Link>
           </div>
@@ -69,12 +65,12 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold">Upcoming Matches</h2>
-              <p className="text-muted-foreground mt-1">Make your predictions before kickoff</p>
+              <h2 className="text-2xl sm:text-3xl font-bold">بازی‌های پیش رو</h2>
+              <p className="text-muted-foreground mt-1">تا شروع نشده پیش‌بینی خودتو ثبت کن</p>
             </div>
             <Link href="/matches">
               <Button variant="outline" className="gap-2 hidden sm:flex">
-                View All
+                بیشتر
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -122,12 +118,12 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold">Top Predictors</h2>
-              <p className="text-muted-foreground mt-1">See who is leading the competition</p>
+              <h2 className="text-2xl sm:text-3xl font-bold">برترین‌ها</h2>
+              <p className="text-muted-foreground mt-1">لیست نوستراداموس‌ها</p>
             </div>
             <Link href="/leaderboard">
               <Button variant="outline" className="gap-2 hidden sm:flex">
-                Full Leaderboard
+                جدول کامل
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -156,8 +152,8 @@ export default function LandingPage() {
                     </Badge>
                   </div>
                   <h3 className="text-lg font-semibold mt-2">{player.name}</h3>
-                  <p className="text-2xl font-bold text-primary mt-1">{player.points} pts</p>
-                  <p className="text-sm text-muted-foreground">{player.correctPredictions} correct predictions</p>
+                  <p className="text-2xl font-bold text-primary mt-1">{player.points} امتیاز</p>
+                  <p className="text-sm text-muted-foreground">{player.correctPredictions} پیش‌بینی درست</p>
                 </CardContent>
               </Card>
             ))}
@@ -169,9 +165,9 @@ export default function LandingPage() {
       <section className="py-16 sm:py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">How It Works</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">چطور کار می‌کنه</h2>
             <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
-              Simple, fun, and competitive. Start predicting in seconds.
+              ساده، جذاب و رقابتی
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
@@ -180,9 +176,9 @@ export default function LandingPage() {
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Target className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Predict Matches</h3>
+                <h3 className="text-lg font-semibold">پیش‌بینی کن</h3>
                 <p className="text-muted-foreground mt-2">
-                  Choose the winner or predict a draw for every World Cup match.
+                  نتیجه رو حدس بزن
                 </p>
               </CardContent>
             </Card>
@@ -191,9 +187,9 @@ export default function LandingPage() {
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Trophy className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Earn Points</h3>
+                <h3 className="text-lg font-semibold">امتیاز جمع کن</h3>
                 <p className="text-muted-foreground mt-2">
-                  Get 3 points for each correct prediction and climb the rankings.
+                  خودتو برسون بالای جدول
                 </p>
               </CardContent>
             </Card>
@@ -202,9 +198,9 @@ export default function LandingPage() {
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Users className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Compete with Friends</h3>
+                <h3 className="text-lg font-semibold">رقابت کن</h3>
                 <p className="text-muted-foreground mt-2">
-                  Challenge your friends and see who knows football best.
+                  بین دوستات کی فوتبال سرش می‌شه
                 </p>
               </CardContent>
             </Card>
@@ -219,13 +215,13 @@ export default function LandingPage() {
             <CardContent className="p-8 sm:p-12 text-center relative">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.1%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50" />
               <div className="relative">
-                <h2 className="text-2xl sm:text-4xl font-bold">Ready to Start Predicting?</h2>
+                <h2 className="text-2xl sm:text-4xl font-bold">آماده‌ای؟</h2>
                 <p className="mt-4 text-primary-foreground/80 text-lg max-w-xl mx-auto">
-                  Join your friends and start making predictions for the World Cup 2026.
+                  منتظر چی هستی؟ تا بازی شروع نشده پیش‌بینی تو ثبت کن.
                 </p>
                 <Link href="/dashboard">
                   <Button size="lg" variant="secondary" className="mt-8 h-12 px-8 text-base gap-2">
-                    Get Started Now
+                    شروع
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -241,9 +237,9 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-primary" />
-              <span>World Cup Predictor 2026</span>
+              <span>پیش‌بینی کن</span>
             </div>
-            <p>A friendly prediction game among friends</p>
+            <p>رقابت کن</p>
           </div>
         </div>
       </footer>
