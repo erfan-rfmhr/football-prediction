@@ -11,11 +11,11 @@ import { cn } from '@/lib/utils'
 import { currentUser } from '@/lib/data'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/matches', label: 'Matches', icon: Calendar },
-  { href: '/predictions', label: 'Predictions', icon: ClipboardList },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/dashboard', label: 'داشبورد', icon: Home },
+  { href: '/matches', label: 'مسابقه‌ها', icon: Calendar },
+  { href: '/predictions', label: 'پیش‌بینی‌ها', icon: ClipboardList },
+  { href: '/leaderboard', label: 'رده‌بندی', icon: Trophy },
+  { href: '/profile', label: 'پروفایل', icon: User },
 ]
 
 export function Navbar() {
@@ -30,7 +30,7 @@ export function Navbar() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
             <Trophy className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight hidden sm:inline-block">World Cup Predictor</span>
+          <span className="text-lg font-bold tracking-tight hidden sm:inline-block">پیش‌بینی فوتبال</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -60,7 +60,7 @@ export function Navbar() {
           {/* Points Badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm">
             <Trophy className="h-4 w-4" />
-            {currentUser.points} pts
+            {currentUser.points} امتیاز
           </div>
 
           {/* User Avatar */}
@@ -77,10 +77,10 @@ export function Navbar() {
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="lg:hidden">
+            <SheetTrigger className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
+                <span className="sr-only">باز و بسته کردن منو</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
@@ -94,7 +94,7 @@ export function Navbar() {
                   </Avatar>
                   <div>
                     <p className="font-semibold">{currentUser.name}</p>
-                    <p className="text-sm text-primary font-medium">{currentUser.points} points</p>
+                    <p className="text-sm text-primary font-medium">{currentUser.points} امتیاز</p>
                   </div>
                 </div>
 
