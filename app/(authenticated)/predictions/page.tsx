@@ -51,11 +51,11 @@ export default function PredictionsPage() {
   const getResultBadge = (result?: 'correct' | 'incorrect' | 'pending') => {
     switch (result) {
       case 'correct':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-500/30" variant="outline">Correct</Badge>
+        return <Badge className="bg-green-500/10 text-green-600 border-green-500/30" variant="outline">درست</Badge>
       case 'incorrect':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/30" variant="outline">Incorrect</Badge>
+        return <Badge className="bg-red-500/10 text-red-500 border-red-500/30" variant="outline">نادرست</Badge>
       default:
-        return <Badge variant="secondary">Pending</Badge>
+        return <Badge variant="secondary">در انتظار</Badge>
     }
   }
 
@@ -63,9 +63,9 @@ export default function PredictionsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">My Predictions</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">پیش‌بینی‌های من</h1>
         <p className="text-muted-foreground mt-1">
-          Track all your predictions and see how you&apos;re performing
+          مشاهده پیش‌بینی‌های انجام شده و تاریخچه نتایج
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export default function PredictionsPage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search matches..."
+            placeholder="جستجوی بازی‌ها..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -82,13 +82,13 @@ export default function PredictionsPage() {
         </div>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="فیلتر بر اساس وضعیت" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="correct">Correct</SelectItem>
-            <SelectItem value="incorrect">Incorrect</SelectItem>
+            <SelectItem value="all">همه وضعیت‌ها</SelectItem>
+            <SelectItem value="pending">در انتظار</SelectItem>
+            <SelectItem value="correct">درست</SelectItem>
+            <SelectItem value="incorrect">نادرست</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -98,11 +98,11 @@ export default function PredictionsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Match</TableHead>
-              <TableHead>Your Prediction</TableHead>
-              <TableHead>Final Result</TableHead>
-              <TableHead className="text-center">Points</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead className='text-center'>بازی</TableHead>
+              <TableHead className='text-center'>پیشبینی شما</TableHead>
+              <TableHead className='text-center'>نتیجه نهایی</TableHead>
+              <TableHead className="text-center">امتیاز</TableHead>
+              <TableHead className="text-center">وضعیت</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -110,14 +110,14 @@ export default function PredictionsPage() {
               const home = teams[pred.match.homeTeam]
               const away = teams[pred.match.awayTeam]
               const predictionText = pred.prediction === 'home' 
-                ? `${home.name} Win` 
+                ? `برد ${home.name}` 
                 : pred.prediction === 'away' 
-                  ? `${away.name} Win` 
-                  : 'Draw'
+                  ? `برد ${away.name}` 
+                  : 'مساوی'
               
               return (
                 <TableRow key={pred.id}>
-                  <TableCell>
+                  <TableCell className='text-center'>
                     <div className="flex items-center gap-3">
                       <span className="text-lg">{home.flag}</span>
                       <span className="font-medium">{home.code}</span>
@@ -126,12 +126,12 @@ export default function PredictionsPage() {
                       <span className="text-lg">{away.flag}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className='text-center'>
                     <Badge variant="outline" className="font-medium">
                       {predictionText}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className='text-center'>
                     {pred.match.status === 'finished' ? (
                       <span className="font-semibold tabular-nums">
                         {pred.match.homeScore} - {pred.match.awayScore}
@@ -165,10 +165,10 @@ export default function PredictionsPage() {
           const home = teams[pred.match.homeTeam]
           const away = teams[pred.match.awayTeam]
           const predictionText = pred.prediction === 'home' 
-            ? `${home.name} Win` 
+            ? `برد ${home.name}` 
             : pred.prediction === 'away' 
-              ? `${away.name} Win` 
-              : 'Draw'
+              ? `برد ${away.name}` 
+              : 'مساوی'
           
           return (
             <div key={pred.id} className="rounded-lg border bg-card p-4 space-y-3">
@@ -184,12 +184,12 @@ export default function PredictionsPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  <span className="text-muted-foreground">Your prediction: </span>
+                  <span className="text-muted-foreground">پیش‌بینی شما: </span>
                   <span className="font-medium">{predictionText}</span>
                 </div>
                 {pred.match.status === 'finished' && (
                   <div>
-                    <span className="text-muted-foreground">Result: </span>
+                    <span className="text-muted-foreground">نتیجه: </span>
                     <span className="font-semibold">{pred.match.homeScore} - {pred.match.awayScore}</span>
                   </div>
                 )}
@@ -199,7 +199,7 @@ export default function PredictionsPage() {
                   'text-sm font-semibold',
                   pred.result === 'correct' ? 'text-green-600' : 'text-red-500'
                 )}>
-                  {pred.result === 'correct' ? `+${pred.pointsEarned} points` : 'No points'}
+                  {pred.result === 'correct' ? `+${pred.pointsEarned} امتیاز` : 'بدون امتیاز'}
                 </div>
               )}
             </div>
@@ -211,9 +211,9 @@ export default function PredictionsPage() {
       {filteredPredictions.length === 0 && (
         <div className="text-center py-16">
           <ClipboardList className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold">No predictions found</h3>
+          <h3 className="text-lg font-semibold">پیش‌بینی یافت نشد</h3>
           <p className="text-muted-foreground mt-1">
-            {search ? 'Try adjusting your search' : 'Start making predictions to see them here'}
+            {search ? 'عبارت دیگری را جستجو کنید' : 'برای مشاهده لیست، پیش‌بینی‌های خود را ثبت کنید'}
           </p>
         </div>
       )}
