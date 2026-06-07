@@ -83,7 +83,7 @@ export default function LeaderboardPage() {
                           <div>
                             <span className="font-medium">{player.name}</span>
                             {isCurrentUser && (
-                              <span className="ml-2 text-xs text-primary font-medium">(You)</span>
+                              <span className="ml-2 text-xs text-primary font-medium">(شما)</span>
                             )}
                           </div>
                         </div>

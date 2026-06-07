@@ -28,7 +28,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
         </Avatar>
         <div className="text-center">
           <p className="font-semibold text-sm">{second.name}</p>
-          <p className="text-sm text-muted-foreground">{second.points} pts</p>
+          <p className="text-sm text-muted-foreground">{second.points} امتیاز</p>
         </div>
         <div className="w-20 sm:w-24 h-24 sm:h-28 rounded-t-lg bg-gradient-to-t from-[var(--silver)]/30 to-[var(--silver)]/10 flex items-center justify-center border border-[var(--silver)]/30 border-b-0">
           <span className="text-3xl sm:text-4xl font-bold text-[var(--silver)]">2</span>
@@ -50,7 +50,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
         </div>
         <div className="text-center">
           <p className="font-semibold">{first.name}</p>
-          <p className="text-sm text-muted-foreground">{first.points} pts</p>
+          <p className="text-sm text-muted-foreground">{first.points} امتیاز</p>
         </div>
         <div className="w-20 sm:w-24 h-32 sm:h-36 rounded-t-lg bg-gradient-to-t from-[var(--gold)]/30 to-[var(--gold)]/10 flex items-center justify-center border border-[var(--gold)]/30 border-b-0">
           <span className="text-4xl sm:text-5xl font-bold text-[var(--gold)]">1</span>
@@ -69,7 +69,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
         </Avatar>
         <div className="text-center">
           <p className="font-semibold text-sm">{third.name}</p>
-          <p className="text-sm text-muted-foreground">{third.points} pts</p>
+          <p className="text-sm text-muted-foreground">{third.points} امتیاز</p>
         </div>
         <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-t-lg bg-gradient-to-t from-[var(--bronze)]/30 to-[var(--bronze)]/10 flex items-center justify-center border border-[var(--bronze)]/30 border-b-0">
           <span className="text-2xl sm:text-3xl font-bold text-[var(--bronze)]">3</span>
