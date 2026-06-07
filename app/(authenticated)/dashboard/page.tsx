@@ -3,9 +3,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatCard } from '@/components/stat-card'
 import { MatchCardCompact } from '@/components/match-card'
-import { ActivityFeed } from '@/components/activity-feed'
-import { currentUser, matches, recentActivity } from '@/lib/data'
-import { Trophy, Medal, Target, Percent, ArrowRight, Calendar } from 'lucide-react'
+import { currentUser, matches } from '@/lib/data'
+import { Trophy, Medal, Target, Percent, ArrowRight, Calendar, Sparkles, Award } from 'lucide-react'
 
 export default function DashboardPage() {
   const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 4)
@@ -89,14 +88,57 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Recent Activity */}
+        {/* Points Calculation Guide */}
         <div>
           <Card>
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold">فعالیت‌های اخیر</CardTitle>
+              <CardTitle className="text-lg font-semibold">نحوه محاسبه امتیازات</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ActivityFeed activities={recentActivity.slice(0, 5)} />
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                امتیاز هر بازی پس از ثبت نتیجه نهایی بر اساس فاکتورهای زیر محاسبه می‌شود:
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                    <Target className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">پیش‌بینی دقیق</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">حدس دقیق نتیجه بازی (مثلاً پیش‌بینی ۲-۱ و پایان بازی با همین نتیجه)</p>
+                    <span className="inline-flex items-center rounded-md bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-2">
+                      ۱۰+ امتیاز
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">پیش‌بینی تفاضل گل</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">حدس درست برنده و تفاضل گل بازی (مثلاً پیش‌بینی ۲-۰ و پایان بازی با نتیجه ۳-۱)</p>
+                    <span className="inline-flex items-center rounded-md bg-blue-500/10 dark:bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-400 mt-2">
+                      ۷+ امتیاز
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+                    <Award className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">پیش‌بینی نتیجه کلی</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">حدس درست برنده بازی (یا مساوی) بدون حدس تفاضل یا نتیجه دقیق</p>
+                    <span className="inline-flex items-center rounded-md bg-amber-500/10 dark:bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400 mt-2">
+                      ۵+ امتیاز
+                    </span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
