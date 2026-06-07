@@ -18,9 +18,9 @@ export default function LeaderboardPage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Leaderboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">رده‌بندی</h1>
         <p className="text-muted-foreground mt-1">
-          See how you rank against your friends
+          اینجا میتونی جایگاهت رو بین بقیه ببینی
         </p>
       </div>
 
@@ -39,11 +39,11 @@ export default function LeaderboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16">Rank</TableHead>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="text-center">Points</TableHead>
-                  <TableHead className="text-center">Correct</TableHead>
-                  <TableHead className="text-center w-20">Trend</TableHead>
+                  <TableHead className="w-16">رتبه</TableHead>
+                  <TableHead className="text-center">بازیکن</TableHead>
+                  <TableHead className="text-center">امتیازات</TableHead>
+                  <TableHead className="text-center">پیش‌بینی‌های درست</TableHead>
+                  <TableHead className="text-center w-20">تغییر رتبه</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 justify-center">
                           <Avatar className={cn(
                             'h-9 w-9 border-2',
                             isCurrentUser ? 'border-primary' : 'border-transparent'
