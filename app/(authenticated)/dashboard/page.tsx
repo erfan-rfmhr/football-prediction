@@ -16,13 +16,13 @@ export default function DashboardPage() {
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">خوش اومدی، {currentUser.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">خوش آمدی، {currentUser.name}</h1>
           <p className="text-muted-foreground mt-1">اینجا می‌تونی فعالیت‌هاتو ببینی</p>
         </div>
         <Link href="/matches">
           <Button className="gap-2">
             <Calendar className="h-4 w-4" />
-            Make Predictions
+            پیش‌بینی
           </Button>
         </Link>
       </div>
@@ -30,32 +30,32 @@ export default function DashboardPage() {
       {/* Statistics */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Points"
+          title="امتیازات شما"
           value={currentUser.points}
           icon={Trophy}
           trend="up"
-          trendValue="12 this week"
+          trendValue="12 این هفته"
         />
         <StatCard
-          title="Current Rank"
+          title="رتبه شما"
           value={`#${currentUser.rank}`}
-          subtitle={`of ${10} players`}
+          subtitle={`از ${10} بازیکن`}
           icon={Medal}
           trend="up"
-          trendValue="2 positions"
+          trendValue=""
         />
         <StatCard
-          title="Predictions Made"
+          title="پیشبینی‌های شما"
           value={currentUser.totalPredictions}
-          subtitle={`${currentUser.correctPredictions} correct`}
+          subtitle={`${currentUser.correctPredictions} درست`}
           icon={Target}
         />
         <StatCard
-          title="Accuracy"
+          title="درصد دقت شما"
           value={`${accuracy}%`}
           icon={Percent}
           trend={accuracy >= 70 ? 'up' : accuracy >= 50 ? 'neutral' : 'down'}
-          trendValue={accuracy >= 70 ? 'Great!' : accuracy >= 50 ? 'Good' : 'Keep trying'}
+          trendValue={accuracy >= 70 ? 'عالی' : accuracy >= 50 ? 'خوب' : 'ادامه بده'}
         />
       </div>
 
@@ -65,10 +65,10 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-lg font-semibold">Upcoming Matches</CardTitle>
+              <CardTitle className="text-lg font-semibold">مسابقات پیش رو</CardTitle>
               <Link href="/matches">
                 <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-                  View All
+                  نمایش همه
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
               {upcomingMatches.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <Calendar className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                  <p>No upcoming matches</p>
+                  <p>تعطیلاته!</p>
                 </div>
               )}
             </CardContent>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
         <div>
           <Card>
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+              <CardTitle className="text-lg font-semibold">فعالیت‌های اخیر</CardTitle>
             </CardHeader>
             <CardContent>
               <ActivityFeed activities={recentActivity.slice(0, 5)} />
