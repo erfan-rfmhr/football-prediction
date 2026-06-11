@@ -1,3 +1,5 @@
+'use client'
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -9,11 +11,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Podium, RankChange } from '@/components/podium'
-import { leaderboard, currentUser } from '@/lib/data'
+import { leaderboard } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 import { Trophy } from 'lucide-react'
 
 export default function LeaderboardPage() {
+  const { user } = useAuth()
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -27,7 +31,7 @@ export default function LeaderboardPage() {
       {/* Podium */}
       <Card className="overflow-hidden bg-gradient-to-b from-muted/50 to-card">
         <CardContent className="pt-4">
-          <Podium users={leaderboard} currentUserId={currentUser.id} />
+          <Podium users={leaderboard} currentUserId={user?.id} />
         </CardContent>
       </Card>
 
@@ -48,7 +52,7 @@ export default function LeaderboardPage() {
               </TableHeader>
               <TableBody>
                 {leaderboard.map((player, index) => {
-                  const isCurrentUser = player.id === currentUser.id
+                  const isCurrentUser = user && player.id === user.id
                   return (
                     <TableRow
                       key={player.id}
@@ -109,7 +113,7 @@ export default function LeaderboardPage() {
           {/* Mobile List */}
           <div className="md:hidden divide-y">
             {leaderboard.map((player, index) => {
-              const isCurrentUser = player.id === currentUser.id
+              const isCurrentUser = user && player.id === user.id
               return (
                 <div
                   key={player.id}

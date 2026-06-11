@@ -1,21 +1,26 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatCard } from '@/components/stat-card'
 import { MatchCardCompact } from '@/components/match-card'
-import { currentUser, matches } from '@/lib/data'
+import { matches } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
 import { Trophy, Medal, Target, Percent, ArrowRight, Calendar, Sparkles, Award } from 'lucide-react'
 
 export default function DashboardPage() {
+  const { user } = useAuth()
   const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 4)
-  const accuracy = Math.round((currentUser.correctPredictions / currentUser.totalPredictions) * 100)
+  if (!user) return null
+  const accuracy = Math.round((user.correctPredictions / user.totalPredictions) * 100)
 
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">خوش آمدی، {currentUser.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">خوش آمدی، {user.name}</h1>
           <p className="text-muted-foreground mt-1">اینجا می‌تونی فعالیت‌هاتو ببینی</p>
         </div>
         <Link href="/matches">
@@ -30,14 +35,14 @@ export default function DashboardPage() {
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="امتیازات شما"
-          value={currentUser.points}
+          value={user.points}
           icon={Trophy}
           trend="up"
           trendValue="12 این هفته"
         />
         <StatCard
           title="رتبه شما"
-          value={`#${currentUser.rank}`}
+          value={`#${user.rank}`}
           subtitle={`از ${10} بازیکن`}
           icon={Medal}
           trend="up"
@@ -45,8 +50,8 @@ export default function DashboardPage() {
         />
         <StatCard
           title="پیشبینی‌های شما"
-          value={currentUser.totalPredictions}
-          subtitle={`${currentUser.correctPredictions} درست`}
+          value={user.totalPredictions}
+          subtitle={`${user.correctPredictions} درست`}
           icon={Target}
         />
         <StatCard

@@ -7,32 +7,40 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, User, Mail } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const { signup } = useAuth();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     if (password !== confirmPassword) {
-      alert("رمز عبور و تکرار آن مطابقت ندارند.");
+      setError("رمز عبور و تکرار آن مطابقت ندارند.");
       return;
     }
     
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsLoading(false);
-    router.push(callbackUrl);
+    try {
+      await signup(username, password, email || undefined);
+      setIsLoading(false);
+      router.push(callbackUrl);
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.message || "Signup failed");
+    }
   };
 
   return (
@@ -44,6 +52,7 @@ function SignupForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-md mb-4">{error}</div>}
         <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-2 relative">
             <div className="relative">

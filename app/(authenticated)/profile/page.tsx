@@ -1,15 +1,19 @@
+'use client'
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { StatCard } from '@/components/stat-card'
 import { AchievementBadge } from '@/components/achievement-badge'
-import { currentUser } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
 import { Trophy, Medal, Target, Percent, Calendar } from 'lucide-react'
 
 export default function ProfilePage() {
-  const accuracy = Math.round((currentUser.correctPredictions / currentUser.totalPredictions) * 100)
-  const earnedAchievements = currentUser.achievements.filter(a => a.earned)
-  const lockedAchievements = currentUser.achievements.filter(a => !a.earned)
+  const { user } = useAuth()
+  if (!user) return null
+  const accuracy = Math.round((user.correctPredictions / user.totalPredictions) * 100)
+  const earnedAchievements = user.achievements.filter(a => a.earned)
+  const lockedAchievements = user.achievements.filter(a => !a.earned)
 
   return (
     <div className="space-y-8">
@@ -19,20 +23,20 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <Avatar className="h-24 w-24 border-4 border-primary/20">
               <AvatarFallback className="text-3xl font-bold bg-primary/10 text-primary">
-                {currentUser.avatar}
+                {user.avatar}
               </AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-bold">{currentUser.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 text-muted-foreground">
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
                   <Calendar className="h-4 w-4" />
-                  <span>Member since {currentUser.memberSince}</span>
+                  <span>Member since {user.memberSince}</span>
                 </div>
                 <Separator orientation="vertical" className="h-4 hidden sm:block" />
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
                   <Trophy className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-foreground">{currentUser.points} points</span>
+                  <span className="font-medium text-foreground">{user.points} points</span>
                 </div>
               </div>
             </div>
@@ -46,18 +50,18 @@ export default function ProfilePage() {
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Points"
-            value={currentUser.points}
+            value={user.points}
             icon={Trophy}
           />
           <StatCard
             title="Current Rank"
-            value={`#${currentUser.rank}`}
+            value={`#${user.rank}`}
             icon={Medal}
           />
           <StatCard
             title="Predictions"
-            value={currentUser.totalPredictions}
-            subtitle={`${currentUser.correctPredictions} correct`}
+            value={user.totalPredictions}
+            subtitle={`${user.correctPredictions} correct`}
             icon={Target}
           />
           <StatCard
@@ -71,7 +75,7 @@ export default function ProfilePage() {
       {/* Achievements */}
       <div>
         <h2 className="text-lg font-semibold mb-4">
-          Achievements ({earnedAchievements.length}/{currentUser.achievements.length})
+          Achievements ({earnedAchievements.length}/{user.achievements.length})
         </h2>
         
         {earnedAchievements.length > 0 && (

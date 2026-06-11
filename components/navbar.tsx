@@ -3,14 +3,19 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Trophy, Home, Calendar, ClipboardList, Users, User } from 'lucide-react'
+import { Menu, Trophy, Home, Calendar, ClipboardList, User, LogIn, UserPlus, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
-import { currentUser } from '@/lib/data'
+import { useAuth } from '@/lib/auth-context'
 
-const navItems = [
+const publicNavItems = [
+  { href: '/matches', label: 'مسابقه‌ها', icon: Calendar },
+  { href: '/leaderboard', label: 'رده‌بندی', icon: Trophy },
+]
+
+const authNavItems = [
   { href: '/dashboard', label: 'داشبورد', icon: Home },
   { href: '/matches', label: 'مسابقه‌ها', icon: Calendar },
   { href: '/predictions', label: 'پیش‌بینی‌ها', icon: ClipboardList },
@@ -21,6 +26,9 @@ const navItems = [
 export function Navbar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const { user, logout } = useAuth()
+
+  const navItems = user ? authNavItems : publicNavItems
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
@@ -57,23 +65,43 @@ export function Navbar() {
 
         {/* User Info & Mobile Menu */}
         <div className="flex items-center gap-3">
-          {/* Points Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm">
-            <Trophy className="h-4 w-4" />
-            {currentUser.points} امتیاز
-          </div>
-
-          {/* User Avatar */}
-          <Link href="/profile" className="hidden sm:block">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 border-2 border-primary/20">
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                  {currentUser.avatar}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-medium hidden md:inline-block">{currentUser.name}</span>
+          {/* Points Badge or Auth Buttons */}
+          {user ? (
+            <>
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                <Trophy className="h-4 w-4" />
+                {user.points} امتیاز
+              </div>
+              <Link href="/profile" className="hidden sm:block">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8 border-2 border-primary/20">
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {user.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium hidden md:inline-block">{user.name}</span>
+                </div>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={logout}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="gap-1">
+                  <LogIn className="h-4 w-4" />
+                  ورود
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="sm" className="gap-1">
+                  <UserPlus className="h-4 w-4" />
+                  ثبت‌نام
+                </Button>
+              </Link>
             </div>
-          </Link>
+          )}
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -83,18 +111,36 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <div className="flex flex-col gap-6 mt-6">
-                {/* User Info in Mobile */}
-                <div className="flex items-center gap-3 pb-4 border-b">
-                  <Avatar className="h-12 w-12 border-2 border-primary/20">
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                      {currentUser.avatar}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">{currentUser.name}</p>
-                    <p className="text-sm text-primary font-medium">{currentUser.points} امتیاز</p>
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3 pb-4 border-b">
+                      <Avatar className="h-12 w-12 border-2 border-primary/20">
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                          {user.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold">{user.name}</p>
+                        <p className="text-sm text-primary font-medium">{user.points} امتیاز</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-3 pb-4 border-b">
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <LogIn className="h-4 w-4" />
+                        ورود
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full justify-start gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        ثبت‌نام
+                      </Button>
+                    </Link>
                   </div>
-                </div>
+                )}
 
                 {/* Mobile Nav Links */}
                 <nav className="flex flex-col gap-1">
@@ -128,11 +174,14 @@ export function Navbar() {
 
 export function MobileBottomNav() {
   const pathname = usePathname()
+  const { user } = useAuth()
+
+  if (!user) return null
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 lg:hidden">
       <div className="flex items-center justify-around h-16">
-        {navItems.slice(0, 5).map((item) => {
+        {authNavItems.slice(0, 5).map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
           return (

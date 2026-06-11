@@ -7,25 +7,32 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, User } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const { login } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsLoading(false);
-    router.push(callbackUrl);
+    try {
+      await login(username, password);
+      setIsLoading(false);
+      router.push(callbackUrl);
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err.message || "Login failed");
+    }
   };
 
   return (
@@ -37,6 +44,7 @@ function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {error && <div className="bg-red-500/20 text-red-400 p-3 rounded-md mb-4">{error}</div>}
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2 relative">
             <div className="relative">
