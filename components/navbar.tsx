@@ -77,11 +77,9 @@ export function Navbar() {
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger className="lg:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">باز و بسته کردن منو</span>
-              </Button>
+            <SheetTrigger className="lg:hidden" render={<Button variant="ghost" size="icon" />}>
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">باز و بسته کردن منو</span>
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <div className="flex flex-col gap-6 mt-6">
