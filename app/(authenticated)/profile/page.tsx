@@ -31,12 +31,12 @@ export default function ProfilePage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 text-muted-foreground">
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
                   <Calendar className="h-4 w-4" />
-                  <span>Member since {user.memberSince}</span>
+                  <span>تاریخ عضویت: {user.memberSince}</span>
                 </div>
                 <Separator orientation="vertical" className="h-4 hidden sm:block" />
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
                   <Trophy className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-foreground">{user.points} points</span>
+                  <span className="font-medium text-foreground">{user.points} امتیاز</span>
                 </div>
               </div>
             </div>
@@ -46,26 +46,26 @@ export default function ProfilePage() {
 
       {/* Statistics */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Statistics</h2>
+        <h2 className="text-lg font-semibold mb-4">آمار</h2>
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="Total Points"
+            title="امتیازات"
             value={user.points}
             icon={Trophy}
           />
           <StatCard
-            title="Current Rank"
+            title="رتبه فعلی"
             value={`#${user.rank}`}
             icon={Medal}
           />
           <StatCard
-            title="Predictions"
+            title="کل پیش‌بینی ها"
             value={user.totalPredictions}
-            subtitle={`${user.correctPredictions} correct`}
+            subtitle={`${user.correctPredictions} صحیح`}
             icon={Target}
           />
           <StatCard
-            title="Accuracy"
+            title="نرخ موفقیت"
             value={`${accuracy}%`}
             icon={Percent}
           />
@@ -75,12 +75,12 @@ export default function ProfilePage() {
       {/* Achievements */}
       <div>
         <h2 className="text-lg font-semibold mb-4">
-          Achievements ({earnedAchievements.length}/{user.achievements.length})
+          مدال ها (به زودی)
         </h2>
         
-        {earnedAchievements.length > 0 && (
+        {/* {earnedAchievements.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Earned</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">موفقیت‌های کسب‌شده</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {earnedAchievements.map((achievement) => (
                 <AchievementBadge key={achievement.id} achievement={achievement} />
@@ -91,14 +91,14 @@ export default function ProfilePage() {
 
         {lockedAchievements.length > 0 && (
           <div>
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Locked</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">مجموعه‌های قفل‌شده</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {lockedAchievements.map((achievement) => (
                 <AchievementBadge key={achievement.id} achievement={achievement} />
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   )
