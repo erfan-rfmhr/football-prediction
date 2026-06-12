@@ -72,3 +72,11 @@ export async function refreshAccessToken() {
   localStorage.setItem('accessToken', data.access);
   return data.access;
 }
+
+export async function getAuthHeaders() {
+  const accessToken = getAccessToken();
+  if (!accessToken) return {};
+  return {
+    'Authorization': `Bearer ${accessToken}`,
+  };
+}

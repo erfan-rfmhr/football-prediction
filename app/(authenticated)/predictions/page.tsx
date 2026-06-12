@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -18,24 +18,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { predictions, teams } from '@/lib/data'
+import { type ApiPrediction, getPredictions } from '@/lib/data'
 import { Search, ClipboardList, CheckCircle2, XCircle, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type StatusFilter = 'all' | 'pending' | 'correct' | 'incorrect'
 
 export default function PredictionsPage() {
+  const [predictions, setPredictions] = useState<ApiPrediction[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
-  const filteredPredictions = predictions.filter(pred => {
-    const home = teams[pred.match.homeTeam]
-    const away = teams[pred.match.awayTeam]
-    const matchText = `${home.name} vs ${away.name}`.toLowerCase()
-    const matchesSearch = matchText.includes(search.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || pred.result === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  useEffect(() => {
+    async function fetchPredictions() {
+      try {
+        const data = await getPredictions()
+        setPredictions(data)
+      } catch (error) {
+        console.error('Failed to fetch predictions:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPredictions()
+  }, [])
+
+  const getResultStatus = (prediction: ApiPrediction): 'correct' | 'incorrect' | 'pending' => {
+    if (prediction.points === null || prediction.points === undefined) return 'pending'
+    return prediction.points > 0 ? 'correct' : 'incorrect'
+  }
 
   const getResultIcon = (result?: 'correct' | 'incorrect' | 'pending') => {
     switch (result) {
@@ -57,6 +69,24 @@ export default function PredictionsPage() {
       default:
         return <Badge variant="secondary">در انتظار</Badge>
     }
+  }
+
+  const filteredPredictions = predictions.filter(pred => {
+    const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
+    const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
+    const matchText = `${homeName || ''} ${awayName || ''}`.toLowerCase()
+    const matchesSearch = matchText.includes(search.toLowerCase())
+    const result = getResultStatus(pred)
+    const matchesStatus = statusFilter === 'all' || result === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -107,34 +137,30 @@ export default function PredictionsPage() {
           </TableHeader>
           <TableBody>
             {filteredPredictions.map((pred) => {
-              const home = teams[pred.match.homeTeam]
-              const away = teams[pred.match.awayTeam]
-              const predictionText = pred.prediction === 'home' 
-                ? `برد ${home.name}` 
-                : pred.prediction === 'away' 
-                  ? `برد ${away.name}` 
-                  : 'مساوی'
+              const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
+              const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
+              const homeScore = typeof pred.match === 'object' ? pred.match.home_score : null
+              const awayScore = typeof pred.match === 'object' ? pred.match.away_score : null
+              const result = getResultStatus(pred)
               
               return (
                 <TableRow key={pred.id}>
                   <TableCell className='text-center'>
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{home.flag}</span>
-                      <span className="font-medium">{home.code}</span>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="font-medium">{homeName}</span>
                       <span className="text-muted-foreground">vs</span>
-                      <span className="font-medium">{away.code}</span>
-                      <span className="text-lg">{away.flag}</span>
+                      <span className="font-medium">{awayName}</span>
                     </div>
                   </TableCell>
                   <TableCell className='text-center'>
                     <Badge variant="outline" className="font-medium">
-                      {predictionText}
+                      {pred.home_score} - {pred.away_score}
                     </Badge>
                   </TableCell>
                   <TableCell className='text-center'>
-                    {pred.match.status === 'finished' ? (
+                    {homeScore !== null && awayScore !== null ? (
                       <span className="font-semibold tabular-nums">
-                        {pred.match.homeScore} - {pred.match.awayScore}
+                        {homeScore} - {awayScore}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">-</span>
@@ -143,14 +169,14 @@ export default function PredictionsPage() {
                   <TableCell className="text-center">
                     <span className={cn(
                       'font-semibold tabular-nums',
-                      pred.result === 'correct' && 'text-green-600',
-                      pred.result === 'incorrect' && 'text-red-500'
+                      result === 'correct' && 'text-green-600',
+                      result === 'incorrect' && 'text-red-500'
                     )}>
-                      {pred.pointsEarned !== undefined ? `+${pred.pointsEarned}` : '-'}
+                      {pred.points !== null && pred.points !== undefined ? `+${pred.points}` : '-'}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
-                    {getResultBadge(pred.result)}
+                    {getResultBadge(result)}
                   </TableCell>
                 </TableRow>
               )
@@ -162,44 +188,40 @@ export default function PredictionsPage() {
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {filteredPredictions.map((pred) => {
-          const home = teams[pred.match.homeTeam]
-          const away = teams[pred.match.awayTeam]
-          const predictionText = pred.prediction === 'home' 
-            ? `برد ${home.name}` 
-            : pred.prediction === 'away' 
-              ? `برد ${away.name}` 
-              : 'مساوی'
+          const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
+          const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
+          const homeScore = typeof pred.match === 'object' ? pred.match.home_score : null
+          const awayScore = typeof pred.match === 'object' ? pred.match.away_score : null
+          const result = getResultStatus(pred)
           
           return (
             <div key={pred.id} className="rounded-lg border bg-card p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{home.flag}</span>
-                  <span className="font-medium text-sm">{home.code}</span>
+                  <span className="font-medium text-sm">{homeName}</span>
                   <span className="text-muted-foreground text-sm">vs</span>
-                  <span className="font-medium text-sm">{away.code}</span>
-                  <span className="text-lg">{away.flag}</span>
+                  <span className="font-medium text-sm">{awayName}</span>
                 </div>
-                {getResultBadge(pred.result)}
+                {getResultBadge(result)}
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div>
                   <span className="text-muted-foreground">پیش‌بینی شما: </span>
-                  <span className="font-medium">{predictionText}</span>
+                  <span className="font-medium">{pred.home_score} - {pred.away_score}</span>
                 </div>
-                {pred.match.status === 'finished' && (
+                {homeScore !== null && awayScore !== null && (
                   <div>
                     <span className="text-muted-foreground">نتیجه: </span>
-                    <span className="font-semibold">{pred.match.homeScore} - {pred.match.awayScore}</span>
+                    <span className="font-semibold">{homeScore} - {awayScore}</span>
                   </div>
                 )}
               </div>
-              {pred.pointsEarned !== undefined && (
+              {pred.points !== null && pred.points !== undefined && (
                 <div className={cn(
                   'text-sm font-semibold',
-                  pred.result === 'correct' ? 'text-green-600' : 'text-red-500'
+                  result === 'correct' ? 'text-green-600' : 'text-red-500'
                 )}>
-                  {pred.result === 'correct' ? `+${pred.pointsEarned} امتیاز` : 'بدون امتیاز'}
+                  {result === 'correct' ? `+${pred.points} امتیاز` : 'بدون امتیاز'}
                 </div>
               )}
             </div>

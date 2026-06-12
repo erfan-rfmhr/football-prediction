@@ -1,39 +1,86 @@
 // داده‌های نمونه برای برنامه پیش‌بینی جام جهانی
 
-export const teams = {
-  ARG: { name: 'آرژانتین', flag: '🇦🇷', code: 'ARG' },
-  BRA: { name: 'برزیل', flag: '🇧🇷', code: 'BRA' },
-  FRA: { name: 'فرانسه', flag: '🇫🇷', code: 'FRA' },
-  GER: { name: 'آلمان', flag: '🇩🇪', code: 'GER' },
-  ESP: { name: 'اسپانیا', flag: '🇪🇸', code: 'ESP' },
-  ENG: { name: 'انگلستان', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', code: 'ENG' },
-  POR: { name: 'پرتغال', flag: '🇵🇹', code: 'POR' },
-  NED: { name: 'هلند', flag: '🇳🇱', code: 'NED' },
-  BEL: { name: 'بلژیک', flag: '🇧🇪', code: 'BEL' },
-  CRO: { name: 'کرواسی', flag: '🇭🇷', code: 'CRO' },
-  URU: { name: 'اروگوئه', flag: '🇺🇾', code: 'URU' },
-  MEX: { name: 'مکزیک', flag: '🇲🇽', code: 'MEX' },
-  USA: { name: 'آمریکا', flag: '🇺🇸', code: 'USA' },
-  JPN: { name: 'ژاپن', flag: '🇯🇵', code: 'JPN' },
-  KOR: { name: 'کره جنوبی', flag: '🇰🇷', code: 'KOR' },
-  SEN: { name: 'سنگال', flag: '🇸🇳', code: 'SEN' },
-} as const
+import * as auth from './auth'
 
-export type TeamCode = keyof typeof teams
+export interface ApiTeam {
+  id: number
+  name: string
+  country?: string
+}
+
+export interface ApiTournament {
+  id: number
+  name: string
+  season: string
+}
+
+export interface ApiPrediction {
+  id: number
+  match: number | ApiMatch
+  created_at: string
+  updated_at: string
+  home_score: number
+  away_score: number
+  points?: number | null
+  user?: number
+}
+
+export interface ApiMatch {
+  id: number
+  tournament: ApiTournament
+  home_team: ApiTeam
+  away_team: ApiTeam
+  user_prediction: ApiPrediction | Record<string, never>
+  stage: string
+  home_score: number | null
+  away_score: number | null
+  start_at: string
+}
 
 export interface Match {
   id: string
-  homeTeam: TeamCode
-  awayTeam: TeamCode
+  homeTeam: ApiTeam
+  awayTeam: ApiTeam
   date: string
   time: string
-  stage: 'مرحله گروهی' | 'مرحله یک‌هشتم' | 'یک‌چهارم نهایی' | 'نیمه‌نهایی' | 'فینال'
+  stage: string
   group?: string
   status: 'upcoming' | 'live' | 'finished'
   homeScore?: number
   awayScore?: number
-  userPrediction?: 'home' | 'draw' | 'away'
+  userPrediction?: {
+    id: number
+    homeScore: number
+    awayScore: number
+  }
   predictionLocked?: boolean
+}
+
+// Convert API Match to Match
+export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
+  const date = new Date(apiMatch.start_at)
+  const userPrediction = Object.keys(apiMatch.user_prediction).length > 0 
+    ? apiMatch.user_prediction as ApiPrediction 
+    : undefined
+  
+  return {
+    id: apiMatch.id.toString(),
+    homeTeam: apiMatch.home_team,
+    awayTeam: apiMatch.away_team,
+    date: date.toISOString().split('T')[0],
+    time: date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
+    stage: apiMatch.stage,
+    status: apiMatch.home_score !== null && apiMatch.away_score !== null ? 'finished' : 'upcoming',
+    homeScore: apiMatch.home_score ?? undefined,
+    awayScore: apiMatch.away_score ?? undefined,
+    userPrediction: userPrediction 
+      ? {
+          id: userPrediction.id,
+          homeScore: userPrediction.home_score,
+          awayScore: userPrediction.away_score,
+        }
+      : undefined,
+  }
 }
 
 export interface User {
@@ -61,7 +108,7 @@ export interface Achievement {
 export interface Prediction {
   id: string
   match: Match
-  prediction: 'home' | 'draw' | 'away'
+  prediction: 'میزبان' | 'مساوی' | 'مهمان'
   result?: 'correct' | 'incorrect' | 'pending'
   pointsEarned?: number
 }
@@ -108,64 +155,33 @@ export const leaderboard: User[] = [
   { id: '10', name: 'حسین', avatar: 'ح', points: 102, rank: 10, previousRank: 10, correctPredictions: 14, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
 ]
 
-// Matches data
-export const matches: Match[] = [
-  { id: '1', homeTeam: 'ARG', awayTeam: 'BRA', date: '2026-06-15', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'A', status: 'upcoming', userPrediction: 'home' },
-  { id: '2', homeTeam: 'FRA', awayTeam: 'GER', date: '2026-06-15', time: '۲۱:۰۰', stage: 'مرحله گروهی', group: 'B', status: 'upcoming' },
-  { id: '3', homeTeam: 'ESP', awayTeam: 'ENG', date: '2026-06-16', time: '۱۵:۰۰', stage: 'مرحله گروهی', group: 'C', status: 'upcoming' },
-  { id: '4', homeTeam: 'POR', awayTeam: 'NED', date: '2026-06-16', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'D', status: 'upcoming' },
-  { id: '5', homeTeam: 'BEL', awayTeam: 'CRO', date: '2026-06-17', time: '۲۱:۰۰', stage: 'مرحله گروهی', group: 'E', status: 'upcoming' },
-  { id: '6', homeTeam: 'URU', awayTeam: 'MEX', date: '2026-06-14', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'F', status: 'live', homeScore: 1, awayScore: 1, userPrediction: 'draw' },
-  { id: '7', homeTeam: 'USA', awayTeam: 'JPN', date: '2026-06-13', time: '۱۵:۰۰', stage: 'مرحله گروهی', group: 'G', status: 'finished', homeScore: 2, awayScore: 1, userPrediction: 'home', predictionLocked: true },
-  { id: '8', homeTeam: 'KOR', awayTeam: 'SEN', date: '2026-06-13', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'H', status: 'finished', homeScore: 0, awayScore: 2, userPrediction: 'home', predictionLocked: true },
-  { id: '9', homeTeam: 'ARG', awayTeam: 'MEX', date: '2026-06-12', time: '۲۱:۰۰', stage: 'مرحله گروهی', group: 'A', status: 'finished', homeScore: 3, awayScore: 0, userPrediction: 'home', predictionLocked: true },
-  { id: '10', homeTeam: 'FRA', awayTeam: 'ENG', date: '2026-06-12', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'B', status: 'finished', homeScore: 2, awayScore: 2, userPrediction: 'draw', predictionLocked: true },
-  { id: '11', homeTeam: 'BRA', awayTeam: 'GER', date: '2026-06-11', time: '۲۱:۰۰', stage: 'مرحله گروهی', group: 'A', status: 'finished', homeScore: 1, awayScore: 1, userPrediction: 'home', predictionLocked: true },
-  { id: '12', homeTeam: 'ESP', awayTeam: 'POR', date: '2026-06-11', time: '۱۸:۰۰', stage: 'مرحله گروهی', group: 'C', status: 'finished', homeScore: 3, awayScore: 2, userPrediction: 'away', predictionLocked: true },
-]
-
 // Helper function to determine if a prediction was correct
 export function isPredictionCorrect(match: Match): boolean | null {
   if (match.status !== 'finished' || match.homeScore === undefined || match.awayScore === undefined || !match.userPrediction) {
     return null
   }
   
-  let actualResult: 'home' | 'draw' | 'away'
+  let actualResult: 'میزبان' | 'مساوی' | 'مهمان'
   if (match.homeScore > match.awayScore) {
-    actualResult = 'home'
+    actualResult = 'میزبان'
   } else if (match.homeScore < match.awayScore) {
-    actualResult = 'away'
+    actualResult = 'مهمان'
   } else {
-    actualResult = 'draw'
+    actualResult = 'مساوی'
   }
   
-  return match.userPrediction === actualResult
+  let predictedResult: 'میزبان' | 'مساوی' | 'مهمان'
+  if (match.userPrediction.homeScore > match.userPrediction.awayScore) {
+    predictedResult = 'میزبان'
+  } else if (match.userPrediction.homeScore < match.userPrediction.awayScore) {
+    predictedResult = 'مهمان'
+  } else {
+    predictedResult = 'مساوی'
+  }
+  
+  return predictedResult === actualResult
 }
 
-// User predictions
-export const predictions: Prediction[] = matches
-  .filter(m => m.userPrediction)
-  .map(match => {
-    const correct = isPredictionCorrect(match)
-    return {
-      id: `pred-${match.id}`,
-      match,
-      prediction: match.userPrediction!,
-      result: match.status === 'finished' ? (correct ? 'correct' : 'incorrect') : 'pending',
-      pointsEarned: match.status === 'finished' ? (correct ? 3 : 0) : undefined,
-    }
-  })
-
-// Recent activity
-export const recentActivity: Activity[] = [
-  { id: '1', type: 'prediction', message: 'پیش‌بینی آرژانتین vs برزیل', timestamp: '۲ ساعت پیش' },
-  { id: '2', type: 'points', message: '۳ امتیاز برای آمریکا vs ژاپن کسب کردید', timestamp: '۱ روز پیش' },
-  { id: '3', type: 'rank', message: 'به رتبه ۵ ارتقا یافتید', timestamp: '۱ روز پیش' },
-  { id: '4', type: 'prediction', message: 'پیش‌بینی فرانسه vs آلمان', timestamp: '۲ روز پیش' },
-  { id: '5', type: 'points', message: '۳ امتیاز برای آرژانتین vs مکزیک کسب کردید', timestamp: '۳ روز پیش' },
-]
-
-// Format date helper
 export function formatMatchDate(dateStr: string): string {
   const date = new Date(dateStr)
   const today = new Date()
@@ -180,3 +196,70 @@ export function formatMatchDate(dateStr: string): string {
     return date.toLocaleDateString('fa-IR', { weekday: 'short', month: 'short', day: 'numeric' })
   }
 }
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+async function getAuthHeaders() {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  
+  const accessToken = auth.getAccessToken()
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`
+  }
+  
+  return headers
+}
+
+export async function createPrediction(matchId: number, homeScore: number, awayScore: number): Promise<ApiPrediction> {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${API_BASE_URL}/api/predictions/`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      match: matchId,
+      home_score: homeScore,
+      away_score: awayScore,
+    }),
+  })
+  
+  if (!response.ok) {
+    throw new Error('Failed to create prediction')
+  }
+  
+  return response.json()
+}
+
+export async function updatePrediction(predictionId: number, homeScore: number, awayScore: number): Promise<ApiPrediction> {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${API_BASE_URL}/api/predictions/${predictionId}/`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({
+      home_score: homeScore,
+      away_score: awayScore,
+    }),
+  })
+  
+  if (!response.ok) {
+    throw new Error('Failed to update prediction')
+  }
+  
+  return response.json()
+}
+
+export async function getPredictions(): Promise<ApiPrediction[]> {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${API_BASE_URL}/api/predictions/`, {
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch predictions')
+  }
+
+  return response.json()
+}
+
+export { getAuthHeaders }

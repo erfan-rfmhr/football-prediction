@@ -5,15 +5,40 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatCard } from '@/components/stat-card'
 import { MatchCardCompact } from '@/components/match-card'
-import { matches } from '@/lib/data'
 import { useAuth } from '@/lib/auth-context'
+import { convertApiMatchToMatch, type ApiMatch, type Match, getAuthHeaders } from '@/lib/data'
 import { Trophy, Medal, Target, Percent, ArrowRight, Calendar, Sparkles, Award } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const [matches, setMatches] = useState<Match[]>([])
+  const [loading, setLoading] = useState(true)
   const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 4)
   if (!user) return null
   const accuracy = Math.round((user.correctPredictions / user.totalPredictions) * 100)
+
+  useEffect(() => {
+    async function fetchMatches() {
+      try {
+        const headers = await getAuthHeaders()
+        const response = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
+          headers,
+        })
+        if (response.ok) {
+          const data: ApiMatch[] = await response.json()
+          setMatches(data.map(convertApiMatchToMatch))
+        }
+      } catch (error) {
+        console.error('Failed to fetch matches:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMatches()
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -78,15 +103,21 @@ export default function DashboardPage() {
               </Link>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {upcomingMatches.map((match) => (
-                  <MatchCardCompact key={match.id} match={match} />
-                ))}
-              </div>
-              {upcomingMatches.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Calendar className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                  <p>تعطیلاته!</p>
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {upcomingMatches.map((match) => (
+                    <MatchCardCompact key={match.id} match={match} />
+                  ))}
+                  {upcomingMatches.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Calendar className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                      <p>تعطیلاته!</p>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>

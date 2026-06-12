@@ -1,64 +1,67 @@
 'use client'
 
-import { useState } from 'react'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MatchCard } from '@/components/match-card'
-import { matches } from '@/lib/data'
-import { Calendar, Radio, CheckCircle2 } from 'lucide-react'
+import { convertApiMatchToMatch, type ApiMatch, type Match } from '@/lib/data'
+import { getAuthHeaders } from '@/lib/auth'
+import { Calendar } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-type FilterType = 'all' | 'upcoming' | 'live' | 'finished'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function MatchesPage() {
-  const [filter, setFilter] = useState<FilterType>('all')
+  const [matches, setMatches] = useState<Match[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const filteredMatches = matches.filter(match => {
-    if (filter === 'all') return true
-    return match.status === filter
-  })
+  async function fetchMatches() {
+    try {
+      const headers = await getAuthHeaders()
+      const response = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
+        headers: headers as HeadersInit,
+      })
+      if (response.ok) {
+        const data: ApiMatch[] = await response.json()
+        setMatches(data.map(convertApiMatchToMatch))
+      }
+    } catch (error) {
+      console.error('Failed to fetch matches:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const upcomingCount = matches.filter(m => m.status === 'upcoming').length
-  const liveCount = matches.filter(m => m.status === 'live').length
-  const finishedCount = matches.filter(m => m.status === 'finished').length
+  useEffect(() => {
+    fetchMatches()
+  }, [refreshKey])
+
+  const filteredMatches = matches
+
+  const handlePrediction = () => {
+    setRefreshKey(prev => prev + 1)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Matches</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">مسابقات</h1>
         <p className="text-muted-foreground mt-1">
-          Make your predictions for upcoming World Cup matches
+          از اینجا میتونی لیست بازی ها رو ببینی و پیش‌بینی کنی
         </p>
       </div>
-
-      {/* Filter Tabs */}
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-          <TabsTrigger value="all" className="gap-2">
-            All
-            <span className="hidden sm:inline text-xs text-muted-foreground">({matches.length})</span>
-          </TabsTrigger>
-          <TabsTrigger value="upcoming" className="gap-2">
-            <Calendar className="h-4 w-4 sm:hidden" />
-            <span className="hidden sm:inline">Upcoming</span>
-            <span className="text-xs text-muted-foreground">({upcomingCount})</span>
-          </TabsTrigger>
-          <TabsTrigger value="live" className="gap-2">
-            <Radio className="h-4 w-4 sm:hidden" />
-            <span className="hidden sm:inline">Live</span>
-            <span className="text-xs text-muted-foreground">({liveCount})</span>
-          </TabsTrigger>
-          <TabsTrigger value="finished" className="gap-2">
-            <CheckCircle2 className="h-4 w-4 sm:hidden" />
-            <span className="hidden sm:inline">Finished</span>
-            <span className="text-xs text-muted-foreground">({finishedCount})</span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
 
       {/* Matches Grid */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filteredMatches.map((match) => (
-          <MatchCard key={match.id} match={match} />
+          <MatchCard key={match.id} match={match} onPredict={handlePrediction} />
         ))}
       </div>
 
@@ -66,11 +69,9 @@ export default function MatchesPage() {
       {filteredMatches.length === 0 && (
         <div className="text-center py-16">
           <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold">No matches found</h3>
+          <h3 className="text-lg font-semibold">هیچ بازی پیدا نشد</h3>
           <p className="text-muted-foreground mt-1">
-            {filter === 'live' && 'No matches are currently live'}
-            {filter === 'upcoming' && 'No upcoming matches scheduled'}
-            {filter === 'finished' && 'No finished matches yet'}
+            مثل این که هیچ بازی نداریم.
           </p>
         </div>
       )}

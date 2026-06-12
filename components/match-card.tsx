@@ -1,40 +1,54 @@
 'use client'
 
-import { teams, type Match, type TeamCode, formatMatchDate, isPredictionCorrect } from '@/lib/data'
+import { type Match, createPrediction, updatePrediction } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Clock, CheckCircle2, XCircle, Lock, Radio } from 'lucide-react'
+import { Clock, CheckCircle2, XCircle, Lock } from 'lucide-react'
 import { useState } from 'react'
 
 interface MatchCardProps {
   match: Match
   showPrediction?: boolean
-  onPredict?: (matchId: string, prediction: 'home' | 'draw' | 'away') => void
+  onPredict?: (matchId: string, homeScore: number, awayScore: number) => void
 }
 
 export function MatchCard({ match, showPrediction = true, onPredict }: MatchCardProps) {
-  const [selectedPrediction, setSelectedPrediction] = useState<'home' | 'draw' | 'away' | undefined>(match.userPrediction)
-  const homeTeam = teams[match.homeTeam]
-  const awayTeam = teams[match.awayTeam]
+  const [homePrediction, setHomePrediction] = useState<string>(match.userPrediction?.homeScore?.toString() || '')
+  const [awayPrediction, setAwayPrediction] = useState<string>(match.userPrediction?.awayScore?.toString() || '')
+  const [isSaving, setIsSaving] = useState(false)
   const isFinished = match.status === 'finished'
   const isLive = match.status === 'live'
-  const isPredicted = !!selectedPrediction
-  const correct = isPredictionCorrect(match)
+  const isPredicted = !!match.userPrediction
 
-  const handlePrediction = (prediction: 'home' | 'draw' | 'away') => {
-    if (isFinished || match.predictionLocked) return
-    setSelectedPrediction(prediction)
-    onPredict?.(match.id, prediction)
+  const handlePrediction = async () => {
+    const homeScore = parseInt(homePrediction)
+    const awayScore = parseInt(awayPrediction)
+    
+    if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0 || isFinished || match.predictionLocked) return
+    
+    setIsSaving(true)
+    try {
+      if (match.userPrediction) {
+        await updatePrediction(match.userPrediction.id, homeScore, awayScore)
+      } else {
+        await createPrediction(parseInt(match.id), homeScore, awayScore)
+      }
+      onPredict?.(match.id, homeScore, awayScore)
+    } catch (error) {
+      console.error('Failed to save prediction:', error)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
     <Card className={cn(
       'overflow-hidden transition-all hover:shadow-md',
       isLive && 'border-primary ring-2 ring-primary/20',
-      isFinished && correct === true && 'border-green-500/50',
-      isFinished && correct === false && 'border-destructive/50'
+      isFinished && 'border-green-500/50'
     )}>
       <CardContent className="p-0">
         {/* Match Header */}
@@ -42,27 +56,11 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="font-normal text-xs">
               {match.stage}
-              {match.group && ` - Group ${match.group}`}
             </Badge>
-            {isLive && (
-              <Badge className="bg-red-500 text-white animate-pulse gap-1">
-                <Radio className="h-3 w-3" />
-                LIVE
-              </Badge>
-            )}
-            {isFinished && correct !== null && (
-              <Badge className={cn(
-                'gap-1',
-                correct ? 'bg-green-500/10 text-green-600 border-green-500/30' : 'bg-destructive/10 text-destructive border-destructive/30'
-              )} variant="outline">
-                {correct ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                {correct ? '+3 pts' : '0 pts'}
-              </Badge>
-            )}
           </div>
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
-            <span>{formatMatchDate(match.date)}</span>
+            <span>{match.date}</span>
             <span className="text-muted-foreground/60">|</span>
             <span>{match.time}</span>
           </div>
@@ -73,35 +71,26 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
           <div className="flex items-center justify-between gap-4">
             {/* Home Team */}
             <div className="flex-1 text-center">
-              <div className="text-4xl mb-2">{homeTeam.flag}</div>
-              <p className="font-semibold text-sm">{homeTeam.name}</p>
+              <p className="font-semibold text-sm">{match.homeTeam.name}</p>
+              {isLive || isFinished ? (
+                <p className="text-3xl font-bold">{match.homeScore}</p>
+              ) : null}
             </div>
 
-            {/* Score / VS */}
-            <div className="flex flex-col items-center gap-1">
-              {isLive || isFinished ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold tabular-nums">{match.homeScore}</span>
-                  <span className="text-muted-foreground text-lg">-</span>
-                  <span className="text-3xl font-bold tabular-nums">{match.awayScore}</span>
-                </div>
-              ) : (
-                <span className="text-2xl font-bold text-muted-foreground">VS</span>
-              )}
-              {isFinished && (
-                <span className="text-xs text-muted-foreground">Final Score</span>
-              )}
-            </div>
+            {/* VS */}
+            <div className="text-muted-foreground font-semibold">VS</div>
 
             {/* Away Team */}
             <div className="flex-1 text-center">
-              <div className="text-4xl mb-2">{awayTeam.flag}</div>
-              <p className="font-semibold text-sm">{awayTeam.name}</p>
+              <p className="font-semibold text-sm">{match.awayTeam.name}</p>
+              {isLive || isFinished ? (
+                <p className="text-3xl font-bold">{match.awayScore}</p>
+              ) : null}
             </div>
           </div>
         </div>
 
-        {/* Prediction Selector */}
+        {/* Prediction Section */}
         {showPrediction && (
           <div className="px-4 pb-4">
             {match.predictionLocked || isFinished ? (
@@ -109,58 +98,39 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
                 <Lock className="h-4 w-4" />
                 <span>
                   {isPredicted 
-                    ? `You predicted: ${selectedPrediction === 'home' ? homeTeam.name : selectedPrediction === 'away' ? awayTeam.name : 'Draw'}`
-                    : 'Predictions locked'
-                  }
+                    ? `پیش‌بینی شما: ${match.userPrediction?.homeScore} - ${match.userPrediction?.awayScore}` 
+                    : 'تمام شده'}
                 </span>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedPrediction === 'home' ? 'default' : 'outline'}
-                  className={cn(
-                    'flex-1 h-12',
-                    selectedPrediction === 'home' && 'bg-primary text-primary-foreground'
-                  )}
-                  onClick={() => handlePrediction('home')}
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={homePrediction}
+                    onChange={(e) => setHomePrediction(e.target.value)}
+                    className="text-center"
+                  />
+                  <span className="text-xl font-bold text-muted-foreground">-</span>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={awayPrediction}
+                    onChange={(e) => setAwayPrediction(e.target.value)}
+                    className="text-center"
+                  />
+                </div>
+                <Button 
+                  onClick={handlePrediction}
+                  disabled={isSaving || homePrediction === '' || awayPrediction === ''}
+                  className="w-full"
                 >
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span className="text-xs opacity-70">Home</span>
-                    <span className="font-semibold">{homeTeam.code}</span>
-                  </span>
-                </Button>
-                <Button
-                  variant={selectedPrediction === 'draw' ? 'default' : 'outline'}
-                  className={cn(
-                    'flex-1 h-12',
-                    selectedPrediction === 'draw' && 'bg-primary text-primary-foreground'
-                  )}
-                  onClick={() => handlePrediction('draw')}
-                >
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span className="text-xs opacity-70">Draw</span>
-                    <span className="font-semibold">X</span>
-                  </span>
-                </Button>
-                <Button
-                  variant={selectedPrediction === 'away' ? 'default' : 'outline'}
-                  className={cn(
-                    'flex-1 h-12',
-                    selectedPrediction === 'away' && 'bg-primary text-primary-foreground'
-                  )}
-                  onClick={() => handlePrediction('away')}
-                >
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span className="text-xs opacity-70">Away</span>
-                    <span className="font-semibold">{awayTeam.code}</span>
-                  </span>
+                  {isSaving ? 'در حال ذخیره...' : isPredicted ? 'به‌روزرسانی پیش‌بینی' : 'ثبت پیش‌بینی'}
                 </Button>
               </div>
-            )}
-            {isPredicted && !isFinished && !match.predictionLocked && (
-              <p className="text-center text-xs text-muted-foreground mt-2">
-                Prediction saved. You can change it until the match starts.
-              </p>
             )}
           </div>
         )}
@@ -171,8 +141,6 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
 
 // Compact match card for dashboard preview
 export function MatchCardCompact({ match }: { match: Match }) {
-  const homeTeam = teams[match.homeTeam]
-  const awayTeam = teams[match.awayTeam]
   const isPredicted = !!match.userPrediction
 
   return (
@@ -180,16 +148,14 @@ export function MatchCardCompact({ match }: { match: Match }) {
       <CardContent className="p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-xl">{homeTeam.flag}</span>
-            <span className="text-sm font-medium truncate">{homeTeam.code}</span>
+            <span className="text-sm font-medium truncate">{match.homeTeam.name}</span>
           </div>
           <div className="text-xs text-muted-foreground text-center shrink-0">
             <div className="font-medium">{match.time}</div>
-            <div>{formatMatchDate(match.date)}</div>
+            <div>{match.date}</div>
           </div>
           <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-            <span className="text-sm font-medium truncate">{awayTeam.code}</span>
-            <span className="text-xl">{awayTeam.flag}</span>
+            <span className="text-sm font-medium truncate">{match.awayTeam.name}</span>
           </div>
         </div>
         <div className="mt-2 flex justify-center">
@@ -197,7 +163,7 @@ export function MatchCardCompact({ match }: { match: Match }) {
             'text-xs',
             isPredicted ? 'bg-primary/10 text-primary border-primary/30' : ''
           )}>
-            {isPredicted ? 'Predicted' : 'Not Predicted'}
+            {isPredicted ? 'پیش‌بینی شده' : 'پیش‌بینی نشده'}
           </Badge>
         </div>
       </CardContent>

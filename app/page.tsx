@@ -1,14 +1,43 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Trophy, Target, Users, ArrowRight, Crown } from 'lucide-react'
-import { matches, leaderboard, teams } from '@/lib/data'
+import { leaderboard, convertApiMatchToMatch, type ApiMatch } from '@/lib/data'
+import { getAuthHeaders } from '@/lib/auth'
+import { useEffect, useState } from 'react'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function LandingPage() {
-  const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 3)
+  const [matches, setMatches] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const topPlayers = leaderboard.slice(0, 3)
+
+  useEffect(() => {
+    async function fetchMatches() {
+      try {
+        const headers = await getAuthHeaders()
+        const res = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
+          headers,
+        })
+        if (res.ok) {
+          const apiMatches: ApiMatch[] = await res.json()
+          setMatches(apiMatches.map(convertApiMatchToMatch))
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMatches()
+  }, [])
+
+  const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 3)
 
   return (
     <div className="min-h-screen">
@@ -58,37 +87,41 @@ export default function LandingPage() {
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingMatches.map((match) => {
-              const home = teams[match.homeTeam]
-              const away = teams[match.awayTeam]
-              return (
+            {loading ? (
+              Array.from({length:3}).map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <CardContent className="p-4 h-40 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              upcomingMatches.map((match) => (
                 <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <Badge variant="outline" className="text-xs">
-                        {match.stage} - Group {match.group}
+                        {match.stage}
                       </Badge>
                       <span className="text-sm text-muted-foreground">{match.time}</span>
                     </div>
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1 text-center">
-                        <div className="text-3xl mb-1">{home.flag}</div>
-                        <p className="text-sm font-medium">{home.name}</p>
+                        <p className="text-sm font-medium">{match.homeTeam.name}</p>
                       </div>
                       <span className="text-xl font-bold text-muted-foreground">VS</span>
                       <div className="flex-1 text-center">
-                        <div className="text-3xl mb-1">{away.flag}</div>
-                        <p className="text-sm font-medium">{away.name}</p>
+                        <p className="text-sm font-medium">{match.awayTeam.name}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              )
-            })}
+              ))
+            )}
           </div>
           <Link href="/matches" className="sm:hidden">
             <Button variant="outline" className="w-full mt-4 gap-2">
-              View All Matches
+              نمایش همه
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
