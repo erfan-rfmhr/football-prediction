@@ -45,8 +45,9 @@ export default function PredictionsPage() {
   }, [])
 
   const getResultStatus = (prediction: ApiPrediction): 'correct' | 'incorrect' | 'pending' => {
-    if (prediction.points === null || prediction.points === undefined) return 'pending'
-    return prediction.points > 0 ? 'correct' : 'incorrect'
+    if (prediction.final_home_score === null || prediction.final_away_score === null) return 'pending'
+    if (prediction.points !== null && prediction.points > 0) return 'correct'
+    return 'incorrect'
   }
 
   const getResultIcon = (result?: 'correct' | 'incorrect' | 'pending') => {
@@ -72,9 +73,7 @@ export default function PredictionsPage() {
   }
 
   const filteredPredictions = predictions.filter(pred => {
-    const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
-    const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
-    const matchText = `${homeName || ''} ${awayName || ''}`.toLowerCase()
+    const matchText = `${pred.home_team || ''} ${pred.away_team || ''}`.toLowerCase()
     const matchesSearch = matchText.includes(search.toLowerCase())
     const result = getResultStatus(pred)
     const matchesStatus = statusFilter === 'all' || result === statusFilter
@@ -136,19 +135,15 @@ export default function PredictionsPage() {
           </TableHeader>
           <TableBody>
             {filteredPredictions.map((pred) => {
-              const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
-              const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
-              const homeScore = typeof pred.match === 'object' ? pred.match.home_score : null
-              const awayScore = typeof pred.match === 'object' ? pred.match.away_score : null
               const result = getResultStatus(pred)
               
               return (
                 <TableRow key={pred.id}>
                   <TableCell className='text-center'>
                     <div className="flex items-center justify-center gap-2">
-                      <span className="font-medium">{homeName}</span>
+                      <span className="font-medium">{pred.home_team}</span>
                       <span className="text-muted-foreground">vs</span>
-                      <span className="font-medium">{awayName}</span>
+                      <span className="font-medium">{pred.away_team}</span>
                     </div>
                   </TableCell>
                   <TableCell className='text-center'>
@@ -157,9 +152,9 @@ export default function PredictionsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className='text-center'>
-                    {homeScore !== null && awayScore !== null ? (
+                    {pred.final_home_score !== null && pred.final_away_score !== null ? (
                       <span className="font-semibold tabular-nums">
-                        {homeScore} - {awayScore}
+                        {pred.final_home_score} - {pred.final_away_score}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">-</span>
@@ -184,28 +179,24 @@ export default function PredictionsPage() {
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {filteredPredictions.map((pred) => {
-          const homeName = typeof pred.match === 'object' ? pred.match.home_team?.name : ''
-          const awayName = typeof pred.match === 'object' ? pred.match.away_team?.name : ''
-          const homeScore = typeof pred.match === 'object' ? pred.match.home_score : null
-          const awayScore = typeof pred.match === 'object' ? pred.match.away_score : null
           const result = getResultStatus(pred)
           
           return (
             <div key={pred.id} className="rounded-lg border bg-card p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{homeName}</span>
+                <span className="font-medium text-sm">{pred.home_team}</span>
                 <span className="text-muted-foreground text-sm">vs</span>
-                <span className="font-medium text-sm">{awayName}</span>
+                <span className="font-medium text-sm">{pred.away_team}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div>
                   <span className="text-muted-foreground">پیش‌بینی شما: </span>
                   <span className="font-medium">{pred.home_score} - {pred.away_score}</span>
                 </div>
-                {homeScore !== null && awayScore !== null && (
+                {pred.final_home_score !== null && pred.final_away_score !== null && (
                   <div>
                     <span className="text-muted-foreground">نتیجه: </span>
-                    <span className="font-semibold">{homeScore} - {awayScore}</span>
+                    <span className="font-semibold">{pred.final_home_score} - {pred.final_away_score}</span>
                   </div>
                 )}
               </div>

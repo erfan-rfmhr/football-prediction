@@ -16,13 +16,15 @@ export interface ApiTournament {
 
 export interface ApiPrediction {
   id: number
-  match: number | ApiMatch
-  created_at: string
-  updated_at: string
+  user: number
+  match: number
   home_score: number
   away_score: number
-  points?: number | null
-  user?: number
+  final_home_score: number | null
+  final_away_score: number | null
+  home_team: string
+  away_team: string
+  points: number | null
 }
 
 export interface ApiMatch {
