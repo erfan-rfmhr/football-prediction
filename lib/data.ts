@@ -234,7 +234,7 @@ export async function createPrediction(matchId: number, homeScore: number, awayS
 export async function updatePrediction(predictionId: number, homeScore: number, awayScore: number): Promise<ApiPrediction> {
   const headers = await getAuthHeaders()
   const response = await fetch(`${API_BASE_URL}/api/predictions/${predictionId}/`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers,
     body: JSON.stringify({
       home_score: homeScore,
