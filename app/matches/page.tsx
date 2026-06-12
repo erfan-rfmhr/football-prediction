@@ -49,7 +49,7 @@ export default function MatchesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-10 pb-10 px-10">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">مسابقات</h1>

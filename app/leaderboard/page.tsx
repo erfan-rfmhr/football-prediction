@@ -19,7 +19,7 @@ import { Trophy } from 'lucide-react'
 export default function LeaderboardPage() {
   const { user } = useAuth()
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pt-10 pb-10 px-4 md:px-6 lg:px-30">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">رده‌بندی</h1>
@@ -146,11 +146,11 @@ export default function LeaderboardPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{player.name}</span>
                       {isCurrentUser && (
-                        <span className="text-xs text-primary font-medium shrink-0">(You)</span>
+                        <span className="text-xs text-primary font-medium shrink-0">(شما)</span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {player.correctPredictions} correct predictions
+                      {player.correctPredictions} پیش‌بینی درست
                     </p>
                   </div>
                   <div className="text-right shrink-0">
@@ -168,9 +168,9 @@ export default function LeaderboardPage() {
       {leaderboard.length === 0 && (
         <div className="text-center py-16">
           <Trophy className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold">No players yet</h3>
+          <h3 className="text-lg font-semibold">هنوز بازیکنی نیست</h3>
           <p className="text-muted-foreground mt-1">
-            Start predicting to appear on the leaderboard
+            شروع به پیش‌بینی کنید تا در رده‌بندی ظاهر شوید
           </p>
         </div>
       )}
