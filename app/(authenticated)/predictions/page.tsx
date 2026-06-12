@@ -132,7 +132,6 @@ export default function PredictionsPage() {
               <TableHead className='text-center'>پیشبینی شما</TableHead>
               <TableHead className='text-center'>نتیجه نهایی</TableHead>
               <TableHead className="text-center">امتیاز</TableHead>
-              <TableHead className="text-center">وضعیت</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -175,9 +174,6 @@ export default function PredictionsPage() {
                       {pred.points !== null && pred.points !== undefined ? `+${pred.points}` : '-'}
                     </span>
                   </TableCell>
-                  <TableCell className="text-center">
-                    {getResultBadge(result)}
-                  </TableCell>
                 </TableRow>
               )
             })}
@@ -196,13 +192,10 @@ export default function PredictionsPage() {
           
           return (
             <div key={pred.id} className="rounded-lg border bg-card p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">{homeName}</span>
-                  <span className="text-muted-foreground text-sm">vs</span>
-                  <span className="font-medium text-sm">{awayName}</span>
-                </div>
-                {getResultBadge(result)}
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-sm">{homeName}</span>
+                <span className="text-muted-foreground text-sm">vs</span>
+                <span className="font-medium text-sm">{awayName}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div>
