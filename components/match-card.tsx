@@ -146,6 +146,12 @@ export function MatchCardCompact({ match }: { match: Match }) {
   return (
     <Card className="overflow-hidden hover:shadow-sm transition-shadow">
       <CardContent className="p-3">
+        {/* Tournament Name */}
+        {match.tournament && (
+          <div className="mb-2 text-xs text-muted-foreground text-center">
+            {match.tournament.name} - {match.stage}
+          </div>
+        )}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-sm font-medium truncate">{match.homeTeam.name}</span>
@@ -159,12 +165,15 @@ export function MatchCardCompact({ match }: { match: Match }) {
           </div>
         </div>
         <div className="mt-2 flex justify-center">
-          <Badge variant={isPredicted ? 'default' : 'secondary'} className={cn(
-            'text-xs',
-            isPredicted ? 'bg-primary/10 text-primary border-primary/30' : ''
-          )}>
-            {isPredicted ? 'پیش‌بینی شده' : 'پیش‌بینی نشده'}
-          </Badge>
+          {isPredicted ? (
+            <Badge variant="default" className="bg-primary/10 text-primary border-primary/30">
+              پیش‌بینی: {match.userPrediction?.homeScore} - {match.userPrediction?.awayScore}
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="text-xs">
+              پیش‌بینی نشده
+            </Badge>
+          )}
         </div>
       </CardContent>
     </Card>

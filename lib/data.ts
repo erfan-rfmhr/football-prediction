@@ -65,6 +65,7 @@ export interface Match {
     awayScore: number
   }
   predictionLocked?: boolean
+  tournament?: ApiTournament
 }
 
 // Convert API Match to Match
@@ -91,6 +92,7 @@ export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
           awayScore: userPrediction.away_score,
         }
       : undefined,
+    tournament: apiMatch.tournament,
   }
 }
 
