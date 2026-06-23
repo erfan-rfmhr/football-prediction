@@ -53,7 +53,12 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
       <CardContent className="p-0">
         {/* Match Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-b">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {match.tournament && (
+              <Badge variant="default" className="font-normal text-xs bg-primary/10 text-primary border-primary/20">
+                {match.tournament.name}
+              </Badge>
+            )}
             <Badge variant="outline" className="font-normal text-xs">
               {match.stage}
             </Badge>
