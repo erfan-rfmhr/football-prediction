@@ -216,7 +216,7 @@ async function getAuthHeaders() {
 
 export async function createPrediction(matchId: number, homeScore: number, awayScore: number): Promise<ApiPrediction> {
   const headers = await getAuthHeaders()
-  const response = await fetch(`${API_BASE_URL}/api/predictions/`, {
+  const response = await fetch(`${API_BASE_URL}/api/competitions/predictions/`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -235,7 +235,7 @@ export async function createPrediction(matchId: number, homeScore: number, awayS
 
 export async function updatePrediction(predictionId: number, homeScore: number, awayScore: number): Promise<ApiPrediction> {
   const headers = await getAuthHeaders()
-  const response = await fetch(`${API_BASE_URL}/api/predictions/${predictionId}/`, {
+  const response = await fetch(`${API_BASE_URL}/api/competitions/predictions/${predictionId}/`, {
     method: 'PATCH',
     headers,
     body: JSON.stringify({
@@ -253,7 +253,7 @@ export async function updatePrediction(predictionId: number, homeScore: number, 
 
 export async function getPredictions(): Promise<ApiPrediction[]> {
   const headers = await getAuthHeaders()
-  const response = await fetch(`${API_BASE_URL}/api/predictions/`, {
+  const response = await fetch(`${API_BASE_URL}/api/competitions/predictions/`, {
     headers,
   })
 
