@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatCard } from '@/components/stat-card'
 import { MatchCardCompact } from '@/components/match-card'
 import { useAuth } from '@/lib/auth-context'
-import { convertApiMatchToMatch, type ApiMatch, type Match, getAuthHeaders } from '@/lib/data'
+import { convertApiMatchToMatch, type ApiMatch, type Match, getAuthHeaders, getDashboardData, type ApiDashboardData } from '@/lib/data'
 import { Trophy, Medal, Target, Percent, ArrowRight, Calendar, Sparkles, Award } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '@/lib/config'
@@ -15,28 +15,38 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<ApiDashboardData | null>(null)
   const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 4)
+
   if (!user) return null
-  const accuracy = Math.round((user.correctPredictions / user.totalPredictions) * 100)
+
+  const accuracy = dashboardData?.accuracy_percentage ??
+    (user.totalPredictions > 0 ? Math.round((user.correctPredictions / user.totalPredictions) * 100) : 0)
 
   useEffect(() => {
-    async function fetchMatches() {
+    async function fetchData() {
       try {
         const headers = await getAuthHeaders()
-        const response = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
+
+        // Fetch matches
+        const matchesResponse = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
           headers,
         })
-        if (response.ok) {
-          const data: ApiMatch[] = await response.json()
+        if (matchesResponse.ok) {
+          const data: ApiMatch[] = await matchesResponse.json()
           setMatches(data.map(convertApiMatchToMatch))
         }
+
+        // Fetch dashboard data
+        const dashboardData = await getDashboardData()
+        setDashboardData(dashboardData)
       } catch (error) {
-        console.error('Failed to fetch matches:', error)
+        console.error('Failed to fetch data:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchMatches()
+    fetchData()
   }, [])
 
   return (
@@ -59,14 +69,14 @@ export default function DashboardPage() {
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="امتیازات شما"
-          value={user.points}
+          value={dashboardData?.total_points ?? user.points}
           icon={Trophy}
           trend="up"
-          trendValue="12 این هفته"
+          trendValue=""
         />
         <StatCard
           title="رتبه شما"
-          value={`#${user.rank}`}
+          value={`#${dashboardData?.user_rank ?? user.rank}`}
           subtitle={`از ${10} بازیکن`}
           icon={Medal}
           trend="up"
@@ -74,8 +84,8 @@ export default function DashboardPage() {
         />
         <StatCard
           title="پیشبینی‌های شما"
-          value={user.totalPredictions}
-          subtitle={`${user.correctPredictions} درست`}
+          value={dashboardData?.total_predictions ?? user.totalPredictions}
+          subtitle={`${dashboardData?.correct_predictions ?? user.correctPredictions} درست`}
           icon={Target}
         />
         <StatCard

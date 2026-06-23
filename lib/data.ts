@@ -28,6 +28,14 @@ export interface ApiPrediction {
   points: number | null
 }
 
+export interface ApiDashboardData {
+  total_points: number
+  user_rank: number
+  total_predictions: number
+  correct_predictions: number
+  accuracy_percentage: number
+}
+
 export interface ApiMatch {
   id: number
   tournament: ApiTournament
@@ -259,6 +267,19 @@ export async function getPredictions(): Promise<ApiPrediction[]> {
 
   if (!response.ok) {
     throw new Error('Failed to fetch predictions')
+  }
+
+  return response.json()
+}
+
+export async function getDashboardData(): Promise<ApiDashboardData> {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${API_BASE_URL}/api/accounts/dashboard/`, {
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch dashboard data')
   }
 
   return response.json()
