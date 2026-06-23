@@ -9,8 +9,7 @@ import { Trophy, Target, Users, ArrowRight, Crown } from 'lucide-react'
 import { leaderboard, convertApiMatchToMatch, type ApiMatch } from '@/lib/data'
 import { getAuthHeaders } from '@/lib/auth'
 import { useEffect, useState } from 'react'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '@/lib/config'
 
 export default function LandingPage() {
   const [matches, setMatches] = useState<any[]>([])

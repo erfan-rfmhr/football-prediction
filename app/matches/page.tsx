@@ -5,8 +5,7 @@ import { convertApiMatchToMatch, type ApiMatch, type Match } from '@/lib/data'
 import { getAuthHeaders } from '@/lib/auth'
 import { Calendar } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '@/lib/config'
 
 export default function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([])

@@ -3,8 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { User, currentUser as mockUser } from './data'
 import * as auth from './auth'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+import { API_BASE_URL } from './config'
 
 interface AuthContextType {
   user: User | null

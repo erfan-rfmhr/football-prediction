@@ -1,5 +1,4 @@
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '@/lib/config'
 
 export async function login(username: string, password: string) {
   const res = await fetch(`${API_BASE_URL}/api/jwt/create/`, {

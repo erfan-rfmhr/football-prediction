@@ -1,6 +1,7 @@
 // داده‌های نمونه برای برنامه پیش‌بینی جام جهانی
 
 import * as auth from './auth'
+import { API_BASE_URL } from './config'
 
 export interface ApiTeam {
   id: number
@@ -199,7 +200,6 @@ export function formatMatchDate(dateStr: string): string {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function getAuthHeaders() {
   const headers: Record<string, string> = {
