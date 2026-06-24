@@ -99,13 +99,15 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
         {showPrediction && (
           <div className="px-4 pb-4">
             {match.predictionLocked || isFinished ? (
-              <div className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground">
-                <Lock className="h-4 w-4" />
-                <span>
-                  {isPredicted 
-                    ? `پیش‌بینی شما: ${match.userPrediction?.homeScore} - ${match.userPrediction?.awayScore}` 
-                    : 'تمام شده'}
-                </span>
+              <div className="flex flex-col items-center justify-center gap-1 py-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  <span>
+                    {isPredicted 
+                      ? `پیش‌بینی شما: ${match.userPrediction?.homeScore} - ${match.userPrediction?.awayScore}` 
+                      : 'تمام شده'}
+                  </span>
+                </div>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
