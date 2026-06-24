@@ -64,8 +64,8 @@ export interface Match {
     homeScore: number
     awayScore: number
   }
-  predictionLocked?: boolean
   tournament?: ApiTournament
+  startedAt?: string
 }
 
 // Convert API Match to Match
@@ -93,6 +93,7 @@ export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
         }
       : undefined,
     tournament: apiMatch.tournament,
+    startedAt: apiMatch.start_at,
   }
 }
 

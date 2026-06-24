@@ -19,15 +19,14 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
   const [homePrediction, setHomePrediction] = useState<string>(match.userPrediction?.homeScore?.toString() || '')
   const [awayPrediction, setAwayPrediction] = useState<string>(match.userPrediction?.awayScore?.toString() || '')
   const [isSaving, setIsSaving] = useState(false)
-  const isFinished = match.status === 'finished'
-  const isLive = match.status === 'live'
+  const isStarted = match.startedAt ? new Date(match.startedAt) <= new Date() : false
   const isPredicted = !!match.userPrediction
 
   const handlePrediction = async () => {
     const homeScore = parseInt(homePrediction)
     const awayScore = parseInt(awayPrediction)
     
-    if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0 || isFinished || match.predictionLocked) return
+    if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0 || isStarted) return
     
     setIsSaving(true)
     try {
@@ -47,8 +46,6 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
   return (
     <Card className={cn(
       'overflow-hidden transition-all hover:shadow-md',
-      isLive && 'border-primary ring-2 ring-primary/20',
-      isFinished && 'border-green-500/50'
     )}>
       <CardContent className="p-0">
         {/* Match Header */}
@@ -62,6 +59,11 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
             <Badge variant="outline" className="font-normal text-xs">
               {match.stage}
             </Badge>
+            {isStarted && (
+              <Badge variant="secondary" className="font-normal text-xs flex items-center gap-1">
+                <Lock className="h-3 w-3" />
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
@@ -77,7 +79,7 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
             {/* Home Team */}
             <div className="flex-1 text-center">
               <p className="font-semibold text-sm">{match.homeTeam.name}</p>
-              {isLive || isFinished ? (
+              {isStarted ? (
                 <p className="text-3xl font-bold">{match.homeScore}</p>
               ) : null}
             </div>
@@ -88,7 +90,7 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
             {/* Away Team */}
             <div className="flex-1 text-center">
               <p className="font-semibold text-sm">{match.awayTeam.name}</p>
-              {isLive || isFinished ? (
+              {isStarted ? (
                 <p className="text-3xl font-bold">{match.awayScore}</p>
               ) : null}
             </div>
@@ -98,14 +100,14 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
         {/* Prediction Section */}
         {showPrediction && (
           <div className="px-4 pb-4">
-            {match.predictionLocked || isFinished ? (
+            {isStarted ? (
               <div className="flex flex-col items-center justify-center gap-1 py-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4" />
                   <span>
-                    {isPredicted 
-                      ? `پیش‌بینی شما: ${match.userPrediction?.homeScore} - ${match.userPrediction?.awayScore}` 
-                      : 'تمام شده'}
+                    {isPredicted
+                      ? `پیش‌بینی شما: ${match.userPrediction?.homeScore} - ${match.userPrediction?.awayScore}`
+                      : isStarted ? 'نتیجه نهایی' : ''}
                   </span>
                 </div>
               </div>
