@@ -23,7 +23,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
           second.id === currentUserId ? 'border-primary' : 'border-[var(--silver)]'
         )}>
           <AvatarFallback className="bg-[var(--silver)]/20 text-lg font-bold">
-            {second.avatar}
+            {second.name?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="text-center">
@@ -44,7 +44,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
             first.id === currentUserId ? 'border-primary' : 'border-[var(--gold)]'
           )}>
             <AvatarFallback className="bg-[var(--gold)]/20 text-xl font-bold">
-              {first.avatar}
+              {first.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -64,7 +64,7 @@ export function Podium({ users, currentUserId }: PodiumProps) {
           third.id === currentUserId ? 'border-primary' : 'border-[var(--bronze)]'
         )}>
           <AvatarFallback className="bg-[var(--bronze)]/20 text-base font-bold">
-            {third.avatar}
+            {third.name?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="text-center">

@@ -37,14 +37,10 @@ async function fetchCurrentUser(): Promise<User> {
   return {
     id: String(apiUser.id),
     name: apiUser.username,
-    avatar: apiUser.username.charAt(0).toUpperCase(),
     points: 0,
     rank: 0,
-    previousRank: 0,
     correctPredictions: 0,
     totalPredictions: 0,
-    memberSince: new Date().toLocaleDateString("fa-IR"),
-    achievements: [],
   };
 }
 

@@ -1,6 +1,5 @@
 'use client'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
@@ -11,13 +10,51 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Podium, RankChange } from '@/components/podium'
-import { leaderboard } from '@/lib/data'
+import { getLeaderboard, User } from '@/lib/data'
 import { useAuth } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 import { Trophy } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export default function LeaderboardPage() {
   const { user } = useAuth()
+  const [leaderboard, setLeaderboard] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const data = await getLeaderboard()
+        setLeaderboard(data)
+      } catch (error) {
+        console.error('Failed to fetch leaderboard:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchLeaderboard()
+  }, [])
+
+  // Identify current user by username instead of id
+  const currentUserIdentifier = user?.name
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 pt-10 pb-10 px-4 md:px-6 lg:px-30">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">رده‌بندی</h1>
+          <p className="text-muted-foreground mt-1">
+            اینجا میتونی جایگاهت رو بین بقیه ببینی
+          </p>
+        </div>
+        <div className="text-center py-16">
+          <p className="text-muted-foreground">در حال بارگذاری...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8 pt-10 pb-10 px-4 md:px-6 lg:px-30">
       {/* Page Header */}
@@ -31,7 +68,7 @@ export default function LeaderboardPage() {
       {/* Podium */}
       <Card className="overflow-hidden bg-gradient-to-b from-muted/50 to-card">
         <CardContent className="pt-4">
-          <Podium users={leaderboard} currentUserId={user?.id} />
+          <Podium users={leaderboard} currentUserId={currentUserIdentifier} />
         </CardContent>
       </Card>
 
@@ -47,12 +84,12 @@ export default function LeaderboardPage() {
                   <TableHead className="text-center">بازیکن</TableHead>
                   <TableHead className="text-center">امتیازات</TableHead>
                   <TableHead className="text-center">پیش‌بینی‌های درست</TableHead>
-                  <TableHead className="text-center w-20">تغییر رتبه</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {leaderboard.map((player, index) => {
-                  const isCurrentUser = user && player.id === user.id
+                  // Identify user by username instead of id
+                  const isCurrentUser = user && player.name === user.name
                   return (
                     <TableRow
                       key={player.id}
@@ -73,17 +110,6 @@ export default function LeaderboardPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3 justify-center">
-                          <Avatar className={cn(
-                            'h-9 w-9 border-2',
-                            isCurrentUser ? 'border-primary' : 'border-transparent'
-                          )}>
-                            <AvatarFallback className={cn(
-                              'font-semibold',
-                              isCurrentUser ? 'bg-primary/10 text-primary' : 'bg-muted'
-                            )}>
-                              {player.avatar}
-                            </AvatarFallback>
-                          </Avatar>
                           <div>
                             <span className="font-medium">{player.name}</span>
                             {isCurrentUser && (
@@ -100,9 +126,6 @@ export default function LeaderboardPage() {
                           {player.correctPredictions}/{player.totalPredictions}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <RankChange current={player.rank} previous={player.previousRank} />
-                      </TableCell>
                     </TableRow>
                   )
                 })}
@@ -113,7 +136,8 @@ export default function LeaderboardPage() {
           {/* Mobile List */}
           <div className="md:hidden divide-y">
             {leaderboard.map((player, index) => {
-              const isCurrentUser = user && player.id === user.id
+              // Identify user by username instead of id
+              const isCurrentUser = user && player.name === user.name
               return (
                 <div
                   key={player.id}
@@ -131,17 +155,6 @@ export default function LeaderboardPage() {
                   )}>
                     {player.rank}
                   </div>
-                  <Avatar className={cn(
-                    'h-10 w-10 border-2 shrink-0',
-                    isCurrentUser ? 'border-primary' : 'border-transparent'
-                  )}>
-                    <AvatarFallback className={cn(
-                      'font-semibold',
-                      isCurrentUser ? 'bg-primary/10 text-primary' : 'bg-muted'
-                    )}>
-                      {player.avatar}
-                    </AvatarFallback>
-                  </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{player.name}</span>
@@ -155,7 +168,6 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold tabular-nums">{player.points}</p>
-                    <RankChange current={player.rank} previous={player.previousRank} />
                   </div>
                 </div>
               )

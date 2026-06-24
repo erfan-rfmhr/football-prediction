@@ -100,14 +100,19 @@ export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
 export interface User {
   id: string
   name: string
-  avatar: string
   points: number
   rank: number
-  previousRank: number
   correctPredictions: number
   totalPredictions: number
-  memberSince: string
-  achievements: Achievement[]
+}
+
+// API response interface for leaderboard
+export interface ApiLeaderboardEntry {
+  username: string
+  points: number
+  rank: number
+  correct_predictions: number
+  total_predictions: number
 }
 
 export interface Achievement {
@@ -138,35 +143,24 @@ export interface Activity {
 export const currentUser: User = {
   id: '1',
   name: 'علی',
-  avatar: 'ع',
   points: 127,
   rank: 5,
-  previousRank: 7,
   correctPredictions: 18,
   totalPredictions: 24,
-  memberSince: 'خرداد ۱۴۰۵',
-  achievements: [
-    { id: '1', title: 'اولین پیش‌بینی', description: 'اولین پیش‌بینی خود را انجام دادید', icon: 'trophy', earned: true, earnedDate: '2026-06-01' },
-    { id: '2', title: 'ده‌گانه', description: 'به ده‌گانه برتر جدول رده‌بندی رسیدید', icon: 'medal', earned: true, earnedDate: '2026-06-10' },
-    { id: '3', title: 'استاد پیش‌بینی', description: '۱۰ پیش‌بینی درست متوالی داشتید', icon: 'star', earned: true, earnedDate: '2026-06-15' },
-    { id: '4', title: 'متخصص جام جهانی', description: 'دقت پیش‌بینی ۸۰٪ را کسب کنید', icon: 'crown', earned: false },
-    { id: '5', title: 'هفته کامل', description: 'همه پیش‌بینی‌های یک هفته را درست انجام دهید', icon: 'zap', earned: false },
-    { id: '6', title: 'قهرمان', description: 'لیگ پیش‌بینی را ببرید', icon: 'award', earned: false },
-  ],
 }
 
 // Leaderboard data
 export const leaderboard: User[] = [
-  { id: '2', name: 'محمد', avatar: 'م', points: 156, rank: 1, previousRank: 1, correctPredictions: 22, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '3', name: 'سارا', avatar: 'س', points: 148, rank: 2, previousRank: 3, correctPredictions: 21, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '4', name: 'حسین', avatar: 'ح', points: 142, rank: 3, previousRank: 2, correctPredictions: 20, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '5', name: 'زهرا', avatar: 'ز', points: 138, rank: 4, previousRank: 4, correctPredictions: 19, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '1', name: 'علی', avatar: 'ع', points: 127, rank: 5, previousRank: 7, correctPredictions: 18, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '6', name: 'رضا', avatar: 'ر', points: 124, rank: 6, previousRank: 5, correctPredictions: 17, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '7', name: 'مریم', avatar: 'م', points: 119, rank: 7, previousRank: 8, correctPredictions: 16, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '8', name: 'امیر', avatar: 'ا', points: 115, rank: 8, previousRank: 6, correctPredictions: 16, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '9', name: 'فاطمه', avatar: 'ف', points: 108, rank: 9, previousRank: 9, correctPredictions: 15, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
-  { id: '10', name: 'حسین', avatar: 'ح', points: 102, rank: 10, previousRank: 10, correctPredictions: 14, totalPredictions: 24, memberSince: 'خرداد ۱۴۰۵', achievements: [] },
+  { id: '2', name: 'محمد',  points: 156, rank: 1, correctPredictions: 22, totalPredictions: 24},
+  { id: '3', name: 'سارا',  points: 148, rank: 2, correctPredictions: 21, totalPredictions: 24},
+  { id: '4', name: 'حسین',  points: 142, rank: 3, correctPredictions: 20, totalPredictions: 24},
+  { id: '5', name: 'زهرا',  points: 138, rank: 4, correctPredictions: 19, totalPredictions: 24},
+  { id: '1', name: 'علی',  points: 127, rank: 5, correctPredictions: 18, totalPredictions: 24},
+  { id: '6', name: 'رضا',  points: 124, rank: 6, correctPredictions: 17, totalPredictions: 24},
+  { id: '7', name: 'مریم',  points: 119, rank: 7, correctPredictions: 16, totalPredictions: 24},
+  { id: '8', name: 'امیر',  points: 115, rank: 8, correctPredictions: 16, totalPredictions: 24},
+  { id: '9', name: 'فاطمه',  points: 108, rank: 9, correctPredictions: 15, totalPredictions: 24},
+  { id: '10', name: 'حسین',  points: 102, rank: 10,  correctPredictions: 14, totalPredictions: 24},
 ]
 
 // Helper function to determine if a prediction was correct
@@ -286,6 +280,29 @@ export async function getDashboardData(): Promise<ApiDashboardData> {
   }
 
   return response.json()
+}
+
+export async function getLeaderboard(): Promise<User[]> {
+  const headers = await getAuthHeaders()
+  const response = await fetch(`${API_BASE_URL}/api/competitions/leaderboard/`, {
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch leaderboard data')
+  }
+
+  const apiData: ApiLeaderboardEntry[] = await response.json()
+
+  // Transform API data to User type
+  return apiData.map((entry) => ({
+    id: entry.username, // Use username as id since API doesn't provide id
+    name: entry.username,
+    points: entry.points,
+    rank: entry.rank,
+    correctPredictions: entry.correct_predictions,
+    totalPredictions: entry.total_predictions,
+  }))
 }
 
 export { getAuthHeaders }
