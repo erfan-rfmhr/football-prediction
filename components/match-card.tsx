@@ -18,8 +18,8 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, showPrediction = true, onPredict }: MatchCardProps) {
-  const [homePrediction, setHomePrediction] = useState<string>(match.userPrediction?.homeScore?.toString() || '')
-  const [awayPrediction, setAwayPrediction] = useState<string>(match.userPrediction?.awayScore?.toString() || '')
+  const [homePrediction, setHomePrediction] = useState<string>(match.userPrediction?.homeScore?.toString() || '0')
+  const [awayPrediction, setAwayPrediction] = useState<string>(match.userPrediction?.awayScore?.toString() || '0')
   const [isSaving, setIsSaving] = useState(false)
   const isStarted = match.startedAt ? new Date(match.startedAt) <= new Date() : false
   const isPredicted = !!match.userPrediction
