@@ -6,8 +6,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Clock, CheckCircle2, XCircle, Lock } from 'lucide-react'
+import { Clock, Lock, LogIn } from 'lucide-react'
 import { useState } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import Link from 'next/link'
 
 interface MatchCardProps {
   match: Match
@@ -21,6 +23,7 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
   const [isSaving, setIsSaving] = useState(false)
   const isStarted = match.startedAt ? new Date(match.startedAt) <= new Date() : false
   const isPredicted = !!match.userPrediction
+  const { user } = useAuth()
 
   const handlePrediction = async () => {
     const homeScore = parseInt(homePrediction)
@@ -100,7 +103,20 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
         {/* Prediction Section */}
         {showPrediction && (
           <div className="px-4 pb-4">
-            {isStarted ? (
+            {!user ? (
+              // User is not authenticated - show login button
+              <div className="flex flex-col items-center justify-center gap-3 py-4">
+                <div className="text-sm text-muted-foreground">
+                  برای ثبت پیش‌بینی ابتدا وارد شوید
+                </div>
+                <Link href="/login" passHref>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <LogIn className="h-4 w-4" />
+                    ورود به حساب
+                  </Button>
+                </Link>
+              </div>
+            ) : isStarted ? (
               <div className="flex flex-col items-center justify-center gap-1 py-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4" />
