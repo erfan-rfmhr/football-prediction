@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { StatCard } from '@/components/stat-card'
 import { AchievementBadge } from '@/components/achievement-badge'
+import { GatheringsSection } from '@/components/gatherings-section'
 import { useAuth } from '@/lib/auth-context'
 import { Trophy, Medal, Target, Percent, Calendar } from 'lucide-react'
 
@@ -60,6 +61,9 @@ export default function ProfilePage() {
           />
         </div>
       </div>
+
+      {/* Gatherings */}
+      <GatheringsSection />
 
       {/* Achievements */}
       <div>
