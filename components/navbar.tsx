@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Menu, Trophy, Home, Calendar, ClipboardList, User, LogIn, UserPlus, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
@@ -68,17 +67,8 @@ export function Navbar() {
           {/* Points Badge or Auth Buttons */}
           {user ? (
             <>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm">
-                <Trophy className="h-4 w-4" />
-                {user.points} امتیاز
-              </div>
               <Link href="/profile" className="hidden sm:block">
                 <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8 border-2 border-primary/20">
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {user.avatar}
-                    </AvatarFallback>
-                  </Avatar>
                   <span className="text-sm font-medium hidden md:inline-block">{user.name}</span>
                 </div>
               </Link>
@@ -114,14 +104,8 @@ export function Navbar() {
                 {user ? (
                   <>
                     <div className="flex items-center gap-3 pb-4 border-b">
-                      <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                          {user.avatar}
-                        </AvatarFallback>
-                      </Avatar>
                       <div>
                         <p className="font-semibold">{user.name}</p>
-                        <p className="text-sm text-primary font-medium">{user.points} امتیاز</p>
                       </div>
                     </div>
                   </>
