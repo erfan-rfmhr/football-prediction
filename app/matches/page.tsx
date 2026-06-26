@@ -1,7 +1,7 @@
 'use client'
 
 import { MatchCard } from '@/components/match-card'
-import { convertApiMatchToMatch, type ApiMatch, type Match } from '@/lib/data'
+import { convertApiMatchToMatch, type ApiMatch, type ApiPrediction, type Match } from '@/lib/data'
 import { getAuthHeaders } from '@/lib/auth'
 import { Calendar, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input'
 export default function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -39,7 +38,7 @@ export default function MatchesPage() {
 
   useEffect(() => {
     fetchMatches(searchQuery)
-  }, [refreshKey, searchQuery])
+  }, [searchQuery])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,8 +49,21 @@ export default function MatchesPage() {
 
   const filteredMatches = matches
 
-  const handlePrediction = () => {
-    setRefreshKey(prev => prev + 1)
+  const handlePrediction = (matchId: string, saved: ApiPrediction) => {
+    setMatches(prev =>
+      prev.map(m =>
+        m.id === matchId
+          ? {
+              ...m,
+              userPrediction: {
+                id: saved.id,
+                homeScore: saved.home_score,
+                awayScore: saved.away_score,
+              },
+            }
+          : m
+      )
+    )
   }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

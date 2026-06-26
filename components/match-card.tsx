@@ -1,6 +1,6 @@
 'use client'
 
-import { type Match, createPrediction, updatePrediction } from '@/lib/data'
+import { type ApiPrediction, type Match, createPrediction, updatePrediction } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import Link from 'next/link'
 interface MatchCardProps {
   match: Match
   showPrediction?: boolean
-  onPredict?: (matchId: string, homeScore: number, awayScore: number) => void
+  onPredict?: (matchId: string, prediction: ApiPrediction) => void
 }
 
 export function MatchCard({ match, showPrediction = true, onPredict }: MatchCardProps) {
@@ -33,12 +33,13 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
     
     setIsSaving(true)
     try {
+      let saved: ApiPrediction
       if (match.userPrediction) {
-        await updatePrediction(match.userPrediction.id, homeScore, awayScore)
+        saved = await updatePrediction(match.userPrediction.id, homeScore, awayScore)
       } else {
-        await createPrediction(parseInt(match.id), homeScore, awayScore)
+        saved = await createPrediction(parseInt(match.id), homeScore, awayScore)
       }
-      onPredict?.(match.id, homeScore, awayScore)
+      onPredict?.(match.id, saved)
     } catch (error) {
       console.error('Failed to save prediction:', error)
     } finally {
