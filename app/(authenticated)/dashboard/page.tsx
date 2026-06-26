@@ -4,37 +4,68 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatCard } from '@/components/stat-card'
-import { MatchCardCompact } from '@/components/match-card'
+import { MatchCard } from '@/components/match-card'
 import { useAuth } from '@/lib/auth-context'
-import { convertApiMatchToMatch, type ApiMatch, type Match, getAuthHeaders, getDashboardData, type ApiDashboardData } from '@/lib/data'
+import { convertApiMatchToMatch, type ApiMatch, type ApiPrediction, type Match, type PaginatedResponse, getAuthHeaders, getDashboardData, type ApiDashboardData } from '@/lib/data'
 import { Trophy, Medal, Target, Percent, ArrowRight, Calendar, Sparkles, Award } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '@/lib/config'
+
+function getDateRange() {
+  const today = new Date()
+  const to = new Date(today)
+  to.setDate(to.getDate() + 3)
+  const fmt = (d: Date) => d.toISOString().split('T')[0]
+  return { dateFrom: fmt(today), dateTo: fmt(to) }
+}
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
   const [dashboardData, setDashboardData] = useState<ApiDashboardData | null>(null)
-  const upcomingMatches = matches.filter(m => m.status === 'upcoming').slice(0, 4)
+  const upcomingMatches = matches
 
   if (!user) return null
 
   const accuracy = dashboardData?.accuracy_percentage ??
     (user.totalPredictions > 0 ? Math.round((user.correctPredictions / user.totalPredictions) * 100) : 0)
 
+  const handlePrediction = (matchId: string, saved: ApiPrediction) => {
+    setMatches(prev =>
+      prev.map(m =>
+        m.id === matchId
+          ? {
+              ...m,
+              userPrediction: {
+                id: saved.id,
+                homeScore: saved.home_score,
+                awayScore: saved.away_score,
+              },
+            }
+          : m
+      )
+    )
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
         const headers = await getAuthHeaders()
 
-        // Fetch matches
-        const matchesResponse = await fetch(`${API_BASE_URL}/api/competitions/matches/`, {
+        // Fetch matches within today..today+3 days window
+        const { dateFrom, dateTo } = getDateRange()
+        const matchesUrl = new URL(`${API_BASE_URL}/api/competitions/matches/`)
+        matchesUrl.searchParams.append('date_from', dateFrom)
+        matchesUrl.searchParams.append('date_to', dateTo)
+        matchesUrl.searchParams.append('page_size', '4')
+
+        const matchesResponse = await fetch(matchesUrl.toString(), {
           headers,
         })
         if (matchesResponse.ok) {
-          const data: ApiMatch[] = await matchesResponse.json()
-          setMatches(data.map(convertApiMatchToMatch))
+          const data: PaginatedResponse<ApiMatch> = await matchesResponse.json()
+          setMatches(data.results.map(convertApiMatchToMatch))
         }
 
         // Fetch dashboard data
@@ -119,7 +150,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {upcomingMatches.map((match) => (
-                    <MatchCardCompact key={match.id} match={match} />
+                    <MatchCard key={match.id} match={match} onPredict={handlePrediction} />
                   ))}
                   {upcomingMatches.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">

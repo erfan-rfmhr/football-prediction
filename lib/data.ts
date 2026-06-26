@@ -1,5 +1,6 @@
 // داده‌های نمونه برای برنامه پیش‌بینی جام جهانی
 
+import { match } from 'assert'
 import * as auth from './auth'
 import { API_BASE_URL } from './config'
 
@@ -48,6 +49,13 @@ export interface ApiMatch {
   start_at: string
 }
 
+export interface PaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
 export interface Match {
   id: string
   homeTeam: ApiTeam
@@ -71,6 +79,7 @@ export interface Match {
 // Convert API Match to Match
 export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
   const date = new Date(apiMatch.start_at)
+  console.log("in convertApiMatchToMatch", apiMatch.id, apiMatch.start_at, date.toLocaleDateString('fa-IR'))
   const userPrediction = Object.keys(apiMatch.user_prediction).length > 0 
     ? apiMatch.user_prediction as ApiPrediction 
     : undefined
@@ -79,7 +88,7 @@ export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
     id: apiMatch.id.toString(),
     homeTeam: apiMatch.home_team,
     awayTeam: apiMatch.away_team,
-    date: date.toISOString().split('T')[0],
+    date: date.toLocaleDateString('fa-IR'),
     time: date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
     stage: apiMatch.stage,
     status: apiMatch.home_score !== null && apiMatch.away_score !== null ? 'finished' : 'upcoming',
