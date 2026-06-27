@@ -4,9 +4,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Trophy, Target, Users, ArrowRight, Crown } from 'lucide-react'
-import { leaderboard, convertApiMatchToMatch, type ApiMatch } from '@/lib/data'
+import { Trophy, ArrowRight } from 'lucide-react'
+import { convertApiMatchToMatch, type ApiMatch, type PaginatedResponse } from '@/lib/data'
 import { getAuthHeaders } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '@/lib/config'
@@ -14,7 +13,6 @@ import { API_BASE_URL } from '@/lib/config'
 export default function LandingPage() {
   const [matches, setMatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const topPlayers = leaderboard.slice(0, 3)
 
   useEffect(() => {
     async function fetchMatches() {
@@ -24,8 +22,8 @@ export default function LandingPage() {
           headers,
         })
         if (res.ok) {
-          const apiMatches: ApiMatch[] = await res.json()
-          setMatches(apiMatches.map(convertApiMatchToMatch))
+          const data: PaginatedResponse<ApiMatch> = await res.json()
+          setMatches(data.results.map(convertApiMatchToMatch))
         }
       } catch (e) {
         console.error(e)
@@ -127,101 +125,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Leaderboard Preview */}
-      <section className="py-16 sm:py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold">برترین‌ها</h2>
-              <p className="text-muted-foreground mt-1">لیست نوستراداموس‌ها</p>
-            </div>
-            <Link href="/leaderboard">
-              <Button variant="outline" className="gap-2 hidden sm:flex">
-                جدول کامل
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {topPlayers.map((player, index) => (
-              <Card key={player.id} className={index === 0 ? 'border-[var(--gold)]/50 bg-[var(--gold)]/5' : ''}>
-                <CardContent className="p-6 text-center">
-                  <div className="relative inline-block">
-                    {index === 0 && (
-                      <Crown className="h-6 w-6 text-[var(--gold)] absolute -top-4 left-1/2 -translate-x-1/2" />
-                    )}
-                    <Avatar className="h-16 w-16 border-4 border-primary/20 mx-auto">
-                      <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
-                        {player.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="mt-4">
-                    <Badge className={
-                      index === 0 ? 'bg-[var(--gold)]/20 text-[var(--gold)] border-[var(--gold)]/30' :
-                      index === 1 ? 'bg-[var(--silver)]/20 text-[var(--silver)] border-[var(--silver)]/30' :
-                      'bg-[var(--bronze)]/20 text-[var(--bronze)] border-[var(--bronze)]/30'
-                    } variant="outline">
-                      #{index + 1}
-                    </Badge>
-                  </div>
-                  <h3 className="text-lg font-semibold mt-2">{player.name}</h3>
-                  <p className="text-2xl font-bold text-primary mt-1">{player.points} امتیاز</p>
-                  <p className="text-sm text-muted-foreground">{player.correctPredictions} پیش‌بینی درست</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-16 sm:py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">چطور کار می‌کنه</h2>
-            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
-              ساده، جذاب و رقابتی
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Target className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">پیش‌بینی کن</h3>
-                <p className="text-muted-foreground mt-2">
-                  نتیجه رو حدس بزن
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Trophy className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">امتیاز جمع کن</h3>
-                <p className="text-muted-foreground mt-2">
-                  خودتو برسون بالای جدول
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">رقابت کن</h3>
-                <p className="text-muted-foreground mt-2">
-                  بین دوستات کی فوتبال سرش می‌شه
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-16 sm:py-24">
         <div className="container mx-auto px-4">
@@ -251,9 +154,8 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-primary" />
-              <span>پیش‌بینی کن</span>
+              <span>سوت آخر</span>
             </div>
-            <p>رقابت کن</p>
           </div>
         </div>
       </footer>

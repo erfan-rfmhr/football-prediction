@@ -11,8 +11,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'پیش‌بینی جام جهانی',
-  description: 'پیش‌بینی مسابقات جام جهانی و رقابت با دوستان خود در جدول رده‌بندی',
+  title: 'سوت آخر',
+  description: 'پیش‌بینی مسابقات و رقابت با دوستان خود در جدول رده‌بندی',
 }
 
 export default function RootLayout({
