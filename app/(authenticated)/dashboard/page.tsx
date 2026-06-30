@@ -108,7 +108,7 @@ export default function DashboardPage() {
         <StatCard
           title="رتبه شما"
           value={`#${dashboardData?.user_rank ?? user.rank}`}
-          subtitle={`از ${10} بازیکن`}
+          subtitle={`از ${dashboardData?.total_users ?? '-'} بازیکن`}
           icon={Medal}
           trend="up"
           trendValue=""

@@ -35,6 +35,7 @@ export interface ApiDashboardData {
   total_predictions: number
   correct_predictions: number
   accuracy_percentage: number
+  total_users: number
 }
 
 export interface ApiMatch {
