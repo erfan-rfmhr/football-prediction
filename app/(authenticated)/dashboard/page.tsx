@@ -15,10 +15,15 @@ function getDateRange() {
   const today = new Date()
   const to = new Date(today)
   to.setDate(to.getDate() + 3)
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
+  const fmt = (d: Date) =>
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Tehran',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(d)
   return { dateFrom: fmt(today), dateTo: fmt(to) }
 }
-
 export default function DashboardPage() {
   const { user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
@@ -59,6 +64,7 @@ export default function DashboardPage() {
         matchesUrl.searchParams.append('date_from', dateFrom)
         matchesUrl.searchParams.append('date_to', dateTo)
         matchesUrl.searchParams.append('page_size', '4')
+        matchesUrl.searchParams.append('o', 'start_at')
 
         const matchesResponse = await fetch(matchesUrl.toString(), {
           headers,
