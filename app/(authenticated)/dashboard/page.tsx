@@ -63,7 +63,7 @@ export default function DashboardPage() {
         const matchesUrl = new URL(`${API_BASE_URL}/api/competitions/matches/`)
         matchesUrl.searchParams.append('date_from', dateFrom)
         matchesUrl.searchParams.append('date_to', dateTo)
-        matchesUrl.searchParams.append('page_size', '4')
+        matchesUrl.searchParams.append('page_size', '100')
         matchesUrl.searchParams.append('o', 'start_at')
 
         const matchesResponse = await fetch(matchesUrl.toString(), {
