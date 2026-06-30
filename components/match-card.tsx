@@ -24,7 +24,6 @@ export function MatchCard({ match, showPrediction = true, onPredict }: MatchCard
   const isStarted = match.startedAt ? new Date(match.startedAt) <= new Date() : false
   const isPredicted = !!match.userPrediction
   const { user } = useAuth()
-  console.log(match.id, match.date)
 
   const handlePrediction = async () => {
     const homeScore = parseInt(homePrediction)

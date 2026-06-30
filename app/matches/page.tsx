@@ -134,7 +134,6 @@ export default function MatchesPage() {
       if (response.ok) {
         const data: PaginatedResponse<ApiMatch> = await response.json()
         const converted = data.results.map(convertApiMatchToMatch)
-        console.log(converted)
         setMatches(prev => (append ? [...prev, ...converted] : converted))
         setNextPage(data.next)
       }
@@ -170,12 +169,21 @@ export default function MatchesPage() {
 
   const handleTabChange = (key: string) => {
     setActiveDate(key)
-    // Extend the window when the user reaches the edge
+    // Extend the window when the user reaches the edge.
+    // Only fetch the newly added days; previously fetched matches are kept.
     if (key === dateRange.from) {
-      setDateRange(prev => ({ ...prev, from: shiftDateKey(prev.from, -RANGE_DAYS) }))
+      const newFrom = shiftDateKey(dateRange.from, -RANGE_DAYS)
+      const fetchFrom = newFrom
+      const fetchTo = shiftDateKey(dateRange.from, -1)
+      setDateRange(prev => ({ ...prev, from: newFrom }))
+      fetchMatches(searchQuery, { from: fetchFrom, to: fetchTo }, true)
     }
     if (key === dateRange.to) {
-      setDateRange(prev => ({ ...prev, to: shiftDateKey(prev.to, RANGE_DAYS) }))
+      const newTo = shiftDateKey(dateRange.to, RANGE_DAYS)
+      const fetchFrom = shiftDateKey(dateRange.to, 1)
+      const fetchTo = newTo
+      setDateRange(prev => ({ ...prev, to: newTo }))
+      fetchMatches(searchQuery, { from: fetchFrom, to: fetchTo }, true)
     }
   }
 

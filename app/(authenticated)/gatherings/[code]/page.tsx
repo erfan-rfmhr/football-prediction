@@ -43,7 +43,6 @@ export default function GatheringDetailPage() {
       setError(null)
       try {
         const data = await getGathering(code)
-        console.log(data.leaderboard)
         setGathering(data)
         setLeaderboard(data.leaderboard || [])
       } catch (err) {

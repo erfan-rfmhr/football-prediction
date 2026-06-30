@@ -80,7 +80,6 @@ export interface Match {
 // Convert API Match to Match
 export function convertApiMatchToMatch(apiMatch: ApiMatch): Match {
   const date = new Date(apiMatch.start_at)
-  console.log("in convertApiMatchToMatch", apiMatch.id, apiMatch.start_at, date.toLocaleDateString('fa-IR'))
   const userPrediction = Object.keys(apiMatch.user_prediction).length > 0 
     ? apiMatch.user_prediction as ApiPrediction 
     : undefined
