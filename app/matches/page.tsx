@@ -32,7 +32,10 @@ function shiftDateKey(key: string, days: number): string {
   return getDateKey(date)
 }
 
-function formatDateLabel(key: string): string {
+function formatDateLabel(key: string, todayKey: string): string {
+  if (key === todayKey) return 'امروز'
+  if (key === shiftDateKey(todayKey, -1)) return 'دیروز'
+  if (key === shiftDateKey(todayKey, 1)) return 'فردا'
   const [y, m, d] = key.split('-').map(Number)
   const date = new Date(Date.UTC(y, m - 1, d))
   return date.toLocaleDateString('fa-IR', {
@@ -97,9 +100,10 @@ export default function MatchesPage() {
   // All dates in the current range, with their matches (if any)
   const dateTabs = useMemo(() => {
     const dates = buildDateRange(dateRange.from, dateRange.to)
+    const todayKey = getDateKey(new Date())
     return dates.map(key => ({
       key,
-      label: formatDateLabel(key),
+      label: formatDateLabel(key, todayKey),
       matches: groupedMatches.get(key) || [],
     }))
   }, [dateRange, groupedMatches])
